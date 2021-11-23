@@ -13,6 +13,14 @@
 
 #include "Scene1.h"
 
+#include "Scene2.h"
+
+#include "Scene3.h"
+
+#include "Scene4.h"
+
+#include "Scene5.h"
+
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
@@ -44,6 +52,10 @@ Application::~Application()
 {
 }
 
+void resize_callback(GLFWwindow* window, int w, int h)
+{
+	glViewport(0, 0, w, h); //update opengl the new window size
+}
 void Application::Init()
 {
 	//Set the error callback
@@ -77,6 +89,8 @@ void Application::Init()
 	//This function makes the context of the specified window current on the calling thread. 
 	glfwMakeContextCurrent(m_window);
 
+	glfwSetWindowSizeCallback(m_window, resize_callback);
+
 	//Sets the key callback
 	//glfwSetKeyCallback(m_window, key_callback);
 
@@ -95,7 +109,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new Scene1();
+	Scene *scene = new Scene5();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
