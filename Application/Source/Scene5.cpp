@@ -51,7 +51,7 @@ void Scene5::Init()
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes",Color(1,1,1),1000, 1000, 1000);
 
-	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("cube", 1, 1,1);
+	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("cube",Color(1,1,1), 1, 1,1);
 
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("Quad",Color(1,0,1), 1, 1);
 

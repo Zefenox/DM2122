@@ -70,23 +70,76 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName,Color color, float l
 	Vertex v;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<unsigned> index_buffer_data;
-	v.pos.Set(0.5f, 0.5f, 0.5f); v.color.Set(0.5,0.7,0.5);
+	v.pos.Set(0.5f, 0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f, 0.5f, 0.5f); v.color.Set(1, 0, 1);
+	v.pos.Set(-0.5f, 0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f, -0.5f, 0.5f); v.color.Set(0.5, 0.7, 0.5);
+	v.pos.Set(-0.5f, -0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5f, -0.5f, 0.5f); v.color.Set(1, 0, 1);
+	v.pos.Set(0.5f, -0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
 
 
-	v.pos.Set(0.5f, 0.5f, -0.5f); v.color.Set(0.5, 0.7, 0.5);
+
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(1);
+	index_buffer_data.push_back(2);
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(2);
+	index_buffer_data.push_back(3);
+	
+
+
+	Mesh* mesh = new Mesh(meshName);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() *
+		sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size()
+		* sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+	mesh->mode = Mesh::DRAW_TRIANGLES;
+	mesh->indexSize = index_buffer_data.size();
+	return mesh;
+
+}
+
+/******************************************************************************/
+/*!
+\brief
+Generate the vertices of a cube; Use random color for each vertex
+Then generate the VBO/IBO and store them in Mesh object
+
+\param meshName - name of mesh
+\param lengthX - width of cube
+\param lengthY - height of cube
+\param lengthZ - depth of cube
+
+\return Pointer to mesh storing VBO/IBO of cube
+*/
+/******************************************************************************/
+Mesh* MeshBuilder::GenerateCube(const std::string &meshName,Color color, float lengthX, float lengthY, float lengthZ)
+{
+
+	Vertex v;
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<unsigned> index_buffer_data;
+	v.pos.Set(0.5f, 0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f, 0.5f, -0.5f); v.color.Set(1, 0, 1);
+	v.pos.Set(-0.5f, 0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f, -0.5f, -0.5f); v.color.Set(0.5, 0.7, 0.5);
+	v.pos.Set(-0.5f, -0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5f, -0.5f, -0.5f); v.color.Set(1, 0, 1);
+	v.pos.Set(0.5f, -0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	vertex_buffer_data.push_back(v);
+
+
+	v.pos.Set(0.5f, 0.5f, -0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f, 0.5f, -0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f, -0.5f, -0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5f, -0.5f, -0.5f); v.color = color; v.normal.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
 
 
@@ -137,7 +190,7 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName,Color color, float l
 	index_buffer_data.push_back(4);
 	index_buffer_data.push_back(6);
 	index_buffer_data.push_back(7);
-	
+
 
 
 	Mesh* mesh = new Mesh(meshName);
@@ -150,36 +203,6 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName,Color color, float l
 	mesh->mode = Mesh::DRAW_TRIANGLES;
 	mesh->indexSize = index_buffer_data.size();
 	return mesh;
-
-}
-
-/******************************************************************************/
-/*!
-\brief
-Generate the vertices of a cube; Use random color for each vertex
-Then generate the VBO/IBO and store them in Mesh object
-
-\param meshName - name of mesh
-\param lengthX - width of cube
-\param lengthY - height of cube
-\param lengthZ - depth of cube
-
-\return Pointer to mesh storing VBO/IBO of cube
-*/
-/******************************************************************************/
-Mesh* MeshBuilder::GenerateCube(const std::string &meshName, float lengthX, float lengthY, float lengthZ)
-{
-	const GLfloat vertex_buffer_data[] = {
-		0
-	};
-	const GLfloat color_buffer_data[] = {
-		0
-	};
-	const GLuint index_buffer_data[] = {
-		0
-	};
-	Mesh *mesh = new Mesh(meshName);
-
 	return mesh;
 }
 
@@ -235,11 +258,14 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 		for (unsigned slice = 0; slice < numSlices + 1; ++slice)
 		{
 			float theta = slice * degreePerSlice;
-			float x = radius * cosf(Math::DegreeToRadian(phi)) * cosf(Math::DegreeToRadian(theta));
-			float y = radius * sinf(Math::DegreeToRadian(phi));
-			float z = radius * cosf(Math::DegreeToRadian(phi)) * sinf(Math::DegreeToRadian(theta));
+			float x = cosf(Math::DegreeToRadian(phi)) * cosf(Math::DegreeToRadian(theta));
+			float y = sinf(Math::DegreeToRadian(phi));
+			float z = cosf(Math::DegreeToRadian(phi)) * sinf(Math::DegreeToRadian(theta));
 
-			v.pos.Set(x, y, z);		v.color = color;	vertex_buffer_data.push_back(v);
+			v.pos.Set(radius * x,radius *  y,radius *  z);		
+			v.color = color;	
+			v.normal.Set(x, y, z);
+			vertex_buffer_data.push_back(v);
 		}
 	}
 	for (unsigned stack = 0; stack < numStacks; ++stack)

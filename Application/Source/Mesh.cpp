@@ -43,10 +43,12 @@ void Mesh::Render()
 {
 	glEnableVertexAttribArray(0); // 1st attribute buffer : vertices
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2); // 3rd attribute : normals
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(Position));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Position) + sizeof(Color)));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	if (mode == DRAW_LINES)
 	{
@@ -64,4 +66,5 @@ void Mesh::Render()
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }

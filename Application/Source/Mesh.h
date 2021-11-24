@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Vertex.h"
+#include "../Material.h"
 
 /******************************************************************************/
 /*!
@@ -30,6 +31,7 @@ public:
 	unsigned colorBuffer;
 	unsigned indexBuffer;
 	unsigned indexSize;
+	Material material;
 };
 
 #endif
