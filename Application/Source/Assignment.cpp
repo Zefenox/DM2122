@@ -36,9 +36,11 @@ void Assignment::Init()
 	translateX = 0;
 	scaleAll = 1;
 
-	/*taildir = D_LEFT;*/
+	taildir = Assignment::TAIL::D_LEFT;
 
 	tailrotate = 0;
+
+	timer = 1.0;
 
 	// Enable depth test
 
@@ -265,7 +267,9 @@ void Assignment::Init()
 
 void Assignment::Update(double dt)
 {
-	static const float LSPEED = 10.0f;
+	static const float LSPEED = 20.0f;
+	timer += dt;
+
 	if (Application::IsKeyPressed('1'))
 	{
 		glEnable(GL_CULL_FACE);
@@ -338,6 +342,7 @@ void Assignment::Update(double dt)
 		tailrotate += 1;
 	}
 
+
 	camera.Update(dt);
 
 	rotateAngleAnti += (float)(40 * dt);
@@ -345,20 +350,33 @@ void Assignment::Update(double dt)
 	spinlikecrazy += (float)(200 * dt);
 	translateX += (float)(10 * dt);
 
-
-	
-
-	/*switch (taildir)
+	if (timer > 2.0)
 	{
-	case D_LEFT:
-		tailrotate -= (float)(10 * dt);
-		break;
-	case D_RIGHT:
-		tailrotate += (float)(10 * dt);
-		break;
-	default:
-		break;
-	}*/
+		switch (taildir)
+		{
+		case Assignment::TAIL::D_LEFT:
+			taildir = Assignment::TAIL::D_RIGHT;
+			timer = 0;
+			break;
+		case Assignment::TAIL::D_RIGHT:
+			taildir = Assignment::TAIL::D_LEFT;
+			timer = 0;
+			break;
+		default:
+			break;
+		}
+		
+	}
+
+	if (taildir == Assignment::TAIL::D_LEFT)
+	{
+		tailrotate -= (float)(30 * dt);
+	}
+	else if (taildir == Assignment::TAIL::D_RIGHT)
+	{
+		tailrotate += (float)(30 * dt);
+	}
+	
 
 	if (scaleAll >2)
 	{
@@ -368,6 +386,8 @@ void Assignment::Update(double dt)
 	{
 		scaleAll = 100;
 	}
+
+
 }
 
 void Assignment::Render()

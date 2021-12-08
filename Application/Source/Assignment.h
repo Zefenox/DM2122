@@ -74,11 +74,11 @@ class Assignment : public Scene
 	    NUM_GEOMETRY,
 	};
 
-	/*enum TAIL
+	enum class TAIL
 	{
 		D_LEFT = 0,
-		D_RIGHT,
-	};*/
+		D_RIGHT = 1,
+	};
 	
 private:
 	unsigned m_vertexArrayID;
@@ -98,7 +98,9 @@ private:
 	float left;
 	float right;
 
-	/*TAIL taildir;*/
+	float timer;
+
+	TAIL taildir;
 
 	Camera2 camera;
 
