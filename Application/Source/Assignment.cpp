@@ -136,8 +136,8 @@ void Assignment::Init()
 	// scene
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("cube", Color(0, 1, 1), 1, 1,1);
 
-	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("Quad",Color(0,1,1), 1, 1);
-	meshList[GEO_QUAD]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("Quad",Color(0.29,0.77,0.26), 1, 1);
+	meshList[GEO_QUAD]->material.kAmbient.Set(0.0f, 0.0f, 0.0f);
 	meshList[GEO_QUAD]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
 	meshList[GEO_QUAD]->material.kShininess = 1.f;
@@ -145,7 +145,7 @@ void Assignment::Init()
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere",Color(1,0,1), 30,30, 2);
 	meshList[GEO_SPHERE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
 	meshList[GEO_SPHERE]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPHERE]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
+	meshList[GEO_SPHERE]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_SPHERE]->material.kShininess = 1.f;
 
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("HafizBall", Color(1, 1, 1), 10, 10, 1);
@@ -213,6 +213,27 @@ void Assignment::Init()
 	meshList[GEO_TAIL]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
 	meshList[GEO_TAIL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_TAIL]->material.kShininess = 1.f;
+
+	//tail ball
+	meshList[GEO_TAILBALL] = MeshBuilder::GenerateSphere("tailball", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_TAILBALL]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_TAILBALL]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_TAILBALL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_TAILBALL]->material.kShininess = 1.f;
+
+	//leg
+	meshList[GEO_RIGHTLEG] = MeshBuilder::GenerateCylinder("leg", Color(1, 0.54, 0.9), 2.6);
+	meshList[GEO_RIGHTLEG]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_RIGHTLEG]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_RIGHTLEG]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_RIGHTLEG]->material.kShininess = 1.f;
+
+	meshList[GEO_LEFTLEG] = MeshBuilder::GenerateCylinder("leg", Color(1, 0.54, 0.9), 2.6);
+	meshList[GEO_LEFTLEG]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_LEFTLEG]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_LEFTLEG]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_LEFTLEG]->material.kShininess = 1.f;
+
 
 }
 
@@ -436,6 +457,17 @@ void Assignment::Render()
 		RenderMesh(meshList[GEO_TAIL], true);
 
 	}
+
+	//tail ball
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 3, 0);
+	modelStack.Rotate(0, 1, 0, 0);
+	modelStack.Scale(1.3, 1.3, 1.3);
+	RenderMesh(meshList[GEO_TAILBALL], true);
+
+	modelStack.PopMatrix();
+
+
 	for (int i = 0; i < 9; i++)
 	{
 		modelStack.PopMatrix();
@@ -480,9 +512,26 @@ void Assignment::Render()
 	modelStack.Scale(0.6, 0.6, 0.7);
 	RenderMesh(meshList[GEO_LEFTARM], true);
 	modelStack.PopMatrix();
+
+	//right leg
+	modelStack.PushMatrix();
+	modelStack.Translate(-2.5, -3, 0.2);
+	/*modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);*/
+	modelStack.Scale(1.2, 1.4, 1.2);
+	RenderMesh(meshList[GEO_RIGHTLEG], true);
+	modelStack.PopMatrix();
 	
-	
-	
+	//left leg
+	modelStack.PushMatrix();
+	modelStack.Translate(2.5, -3, 0.2);
+	/*modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);*/
+	modelStack.Scale(1.2, 1.4, 1.2);
+	RenderMesh(meshList[GEO_LEFTLEG], true);
+	modelStack.PopMatrix();
 	
 
 }
