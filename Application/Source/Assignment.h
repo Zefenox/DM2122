@@ -57,6 +57,7 @@ class Assignment : public Scene
 		GEO_LIGHTBALL,
 		GEO_HEAD,
 		GEO_HEADFRONT,
+		GEO_HEADHORNS,
 		GEO_EYESPHERE,
 		GEO_EYECONE,
 		GEO_MOUTH,
@@ -65,12 +66,19 @@ class Assignment : public Scene
 		GEO_RIGHTARM,
 		GEO_LEFTARM,
 		GEO_RIGHTLEG,
+		GEO_RIGHTLEGFOOT,
 		GEO_LEFTLEG,
+		GEO_LEFTLEGFOOT,
 		GEO_TAIL,
 		GEO_TAILBALL,
 	    NUM_GEOMETRY,
 	};
 
+	/*enum TAIL
+	{
+		D_LEFT = 0,
+		D_RIGHT,
+	};*/
 	
 private:
 	unsigned m_vertexArrayID;
@@ -85,9 +93,12 @@ private:
 	float spinlikecrazy;
 	float translateX;
 	float scaleAll;
+	float tailrotate;
 
 	float left;
 	float right;
+
+	/*TAIL taildir;*/
 
 	Camera2 camera;
 

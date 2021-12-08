@@ -36,6 +36,10 @@ void Assignment::Init()
 	translateX = 0;
 	scaleAll = 1;
 
+	/*taildir = D_LEFT;*/
+
+	tailrotate = 0;
+
 	// Enable depth test
 
 	//load vertex and fragment shaders
@@ -79,7 +83,7 @@ void Assignment::Init()
 	light[0].type = Light::LIGHT_POINT;
 	light[0].position.Set(0, 5, 9);
 	light[0].color.Set(1, 1, 1);
-	light[0].power = 0.9;
+	light[0].power = 0.9f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -193,6 +197,14 @@ void Assignment::Init()
 	meshList[GEO_MOUTH]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_MOUTH]->material.kShininess = 1.f;
 
+	//HEAD HORNS
+	meshList[GEO_HEADHORNS] = MeshBuilder::GenerateHemiSphere("Head horns", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_HEADHORNS]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HEADHORNS]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_HEADHORNS]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HEADHORNS]->material.kShininess = 1.f;
+
+
 	//right arm
 	meshList[GEO_RIGHTARM] = MeshBuilder::GenerateHemiSphere("Right Arm", Color(1, 0.54, 0.9), 30, 30, 2);
 	meshList[GEO_RIGHTARM]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
@@ -208,7 +220,7 @@ void Assignment::Init()
 	meshList[GEO_LEFTARM]->material.kShininess = 1.f;
 
 	//tail
-	meshList[GEO_TAIL] = MeshBuilder::GenerateConicalFrustum("tail", Color(1, 0.54, 0.9), 0.8, 1, 1.5);
+	meshList[GEO_TAIL] = MeshBuilder::GenerateConicalFrustum("tail", Color(1, 0.54, 0.9), 0.8, 1.0, 1.5);
 	meshList[GEO_TAIL]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_TAIL]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
 	meshList[GEO_TAIL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
@@ -221,18 +233,32 @@ void Assignment::Init()
 	meshList[GEO_TAILBALL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_TAILBALL]->material.kShininess = 1.f;
 
-	//leg
-	meshList[GEO_RIGHTLEG] = MeshBuilder::GenerateCylinder("leg", Color(1, 0.54, 0.9), 2.6);
+	//right leg
+	meshList[GEO_RIGHTLEG] = MeshBuilder::GenerateCylinder("right leg", Color(1.0, 0.54, 0.9), 2.6);
 	meshList[GEO_RIGHTLEG]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_RIGHTLEG]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
 	meshList[GEO_RIGHTLEG]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_RIGHTLEG]->material.kShininess = 1.f;
 
-	meshList[GEO_LEFTLEG] = MeshBuilder::GenerateCylinder("leg", Color(1, 0.54, 0.9), 2.6);
+	meshList[GEO_RIGHTLEGFOOT] = MeshBuilder::GenerateHemiSphere("right leg foot", Color(1, 0.54, 0.9), 20, 20 ,1);
+	meshList[GEO_RIGHTLEGFOOT]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_RIGHTLEGFOOT]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_RIGHTLEGFOOT]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_RIGHTLEGFOOT]->material.kShininess = 1.f;
+
+	//Left leg
+
+	meshList[GEO_LEFTLEG] = MeshBuilder::GenerateCylinder("left leg", Color(1.0, 0.54, 0.9), 2.6);
 	meshList[GEO_LEFTLEG]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_LEFTLEG]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
 	meshList[GEO_LEFTLEG]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_LEFTLEG]->material.kShininess = 1.f;
+
+	meshList[GEO_LEFTLEGFOOT] = MeshBuilder::GenerateHemiSphere("left leg foot", Color(1, 0.54, 0.9), 20, 20, 1);
+	meshList[GEO_LEFTLEGFOOT]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_LEFTLEGFOOT]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_LEFTLEGFOOT]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_LEFTLEGFOOT]->material.kShininess = 1.f;
 
 
 }
@@ -301,12 +327,39 @@ void Assignment::Update(double dt)
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
 
+	if (Application::IsKeyPressed('G'))
+	{
+		//to do: switch light type to POINT and pass the information to shader
+		tailrotate -= 1;
+	}
+	else if (Application::IsKeyPressed('H'))
+	{
+		//to do: switch light type to POINT and pass the information to shader
+		tailrotate += 1;
+	}
+
 	camera.Update(dt);
 
 	rotateAngleAnti += (float)(40 * dt);
 	rotateAngleClock -= (float)(50 * dt);
 	spinlikecrazy += (float)(200 * dt);
 	translateX += (float)(10 * dt);
+
+
+	
+
+	/*switch (taildir)
+	{
+	case D_LEFT:
+		tailrotate -= (float)(10 * dt);
+		break;
+	case D_RIGHT:
+		tailrotate += (float)(10 * dt);
+		break;
+	default:
+		break;
+	}*/
+
 	if (scaleAll >2)
 	{
 		scaleAll -= (float)(20 * dt);
@@ -315,7 +368,6 @@ void Assignment::Update(double dt)
 	{
 		scaleAll = 100;
 	}
-	
 }
 
 void Assignment::Render()
@@ -374,7 +426,7 @@ void Assignment::Render()
 
 	modelStack.PushMatrix();
 	modelStack.Rotate(-90, 1, 0, 0);
-	modelStack.Translate(0, 0, -20);
+	modelStack.Translate(0, 0, -23);
 	modelStack.Scale(30, 30, 30);
 	RenderMesh(meshList[GEO_QUAD], true);
 	modelStack.PopMatrix();
@@ -419,8 +471,71 @@ void Assignment::Render()
 	modelStack.Translate(0,-0.3, 1.7);
 	modelStack.Rotate(180, 1, 0, 0);
 	/*modelStack.Rotate(10, 0, 1, 0);*/
-	modelStack.Scale(0.5, 0.45, 0.2);
+	modelStack.Scale(0.5f, 0.45f, 0.2f);
 	RenderMesh(meshList[GEO_MOUTH], true);
+	modelStack.PopMatrix();
+
+	//horns
+	// right horn
+	modelStack.PushMatrix();
+	modelStack.Translate(-0.8f, 1.4f, 0.3f);
+	modelStack.Rotate(5, 0, 0, 1);
+	modelStack.Rotate(-10, 1, 0, 0);
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.25f, 0.9f, 0.3f);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	//left horn
+	modelStack.PushMatrix();
+	modelStack.Translate(0.8, 1.4, 0.3);
+	modelStack.Rotate(-5, 0, 0, 1);
+	modelStack.Rotate(-10, 1, 0, 0);
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.25f, 0.9f, 0.3f);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	//right face scales
+	modelStack.PushMatrix();
+	modelStack.Translate(-1.6, 0, 0.3);
+	modelStack.Rotate(90, 0, 0, 1);
+	modelStack.Rotate(-40, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.3f, 0.6f, 0.2f);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-1.6, -0.7, 0);
+	modelStack.Rotate(130, 0, 0, 1);
+	modelStack.Rotate(-20, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.2, 0.4, 0.15);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	//left face scales
+	modelStack.PushMatrix();
+	modelStack.Translate(1.6, 0, 0.3);
+	modelStack.Rotate(-90, 0, 0, 1);
+	modelStack.Rotate(-40, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.3, 0.6, 0.2);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(1.6, -0.7, 0);
+	modelStack.Rotate(-130, 0, 0, 1);
+	modelStack.Rotate(-20, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.2, 0.4, 0.15);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
 	modelStack.PopMatrix();
 
 	modelStack.PopMatrix();
@@ -451,8 +566,9 @@ void Assignment::Render()
 	for (int i = 0; i < 9; i++)
 	{
 		modelStack.PushMatrix();
-		modelStack.Translate(0, 0.7, 0);
 		modelStack.Rotate(6, 1, 0, 0);
+		modelStack.Rotate(tailrotate, 0, 1, 0);
+		modelStack.Translate(0, 0.7, 0);
 		modelStack.Scale(0.9, 0.9, 0.9);
 		RenderMesh(meshList[GEO_TAIL], true);
 
@@ -521,16 +637,39 @@ void Assignment::Render()
 	modelStack.Rotate(20, 1, 0, 0);*/
 	modelStack.Scale(1.2, 1.4, 1.2);
 	RenderMesh(meshList[GEO_RIGHTLEG], true);
-	modelStack.PopMatrix();
 	
-	//left leg
+
+	//right foot
 	modelStack.PushMatrix();
-	modelStack.Translate(2.5, -3, 0.2);
+	modelStack.Translate(0, -1.2, 0.2);
 	/*modelStack.Rotate(50, 0, 0, 1);
 	modelStack.Rotate(60, 0, 1, 0);
 	modelStack.Rotate(20, 1, 0, 0);*/
-	modelStack.Scale(1.2, 1.4, 1.2);
+	modelStack.Scale(1.2, 0.8, 1.3);
+	RenderMesh(meshList[GEO_RIGHTLEGFOOT], true);
+	modelStack.PopMatrix();
+	
+	modelStack.PopMatrix();
+
+	//left leg
+	modelStack.PushMatrix();
+	modelStack.Translate(2.5, -3, 0.1);
+	/*modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);*/
+	modelStack.Scale(1.1, 1.4, 1.2);
 	RenderMesh(meshList[GEO_LEFTLEG], true);
+	
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, -1.2, 0.2);
+	/*modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);*/
+	modelStack.Scale(1.2, 0.8, 1.3);
+	RenderMesh(meshList[GEO_LEFTLEGFOOT], true);
+	modelStack.PopMatrix();
+
 	modelStack.PopMatrix();
 	
 
@@ -575,6 +714,8 @@ void Assignment::Exit()
 	delete meshList[GEO_CIRCLE];
 	delete meshList[GEO_LIGHTBALL];
 	delete meshList[GEO_HEAD];
+	delete meshList[GEO_HEADFRONT];
+	delete meshList[GEO_HEADHORNS];
 	delete meshList[GEO_MOUTH];
 	delete meshList[GEO_BODY];
 	delete meshList[GEO_RIGHTARM];
