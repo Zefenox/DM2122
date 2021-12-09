@@ -36,11 +36,27 @@ void Assignment::Init()
 	translateX = 0;
 	scaleAll = 1;
 
-	taildir = Assignment::TAIL::D_LEFT;
+	taildir = Assignment::DIR::D_LEFT;
+
+	rightleg = Assignment::DIR::D_FORWARD;
+	leftleg = Assignment::DIR::D_BACKWARD;
+
+	jumpdir = Assignment::DIR::D_UP;
 
 	tailrotate = 0;
+	rightlegrotate = 0;
+	leftlegrotate = 0;
+
+	jumpoffset = 0;
 
 	timer = 1.0;
+	timer1 = 0.2;
+	timer3 = 0;
+
+	walk = 0;
+
+	jump = false;
+	jumphigh = false;
 
 	// Enable depth test
 
@@ -269,6 +285,7 @@ void Assignment::Update(double dt)
 {
 	static const float LSPEED = 20.0f;
 	timer += dt;
+	
 
 	if (Application::IsKeyPressed('1'))
 	{
@@ -334,13 +351,34 @@ void Assignment::Update(double dt)
 	if (Application::IsKeyPressed('G'))
 	{
 		//to do: switch light type to POINT and pass the information to shader
-		tailrotate -= 1;
+		walk = 1;
+		jump = true;
+	}
+	if (Application::IsKeyPressed('B'))
+	{
+		//to do: switch light type to POINT and pass the information to shader
+		jumphigh = true;
 	}
 	else if (Application::IsKeyPressed('H'))
 	{
 		//to do: switch light type to POINT and pass the information to shader
-		tailrotate += 1;
+		rightleg = Assignment::DIR::D_FORWARD;
+		leftleg = Assignment::DIR::D_BACKWARD;
+		jumpdir = Assignment::DIR::D_UP;
+
+		rightlegrotate = 0;
+		leftlegrotate = 0;
+
+		walk = 0;
+		timer1 = 0.2;
+		timer3 = 0;
+		jumpoffset = 0;
+		jump = false;
+		jumphigh = false;
+
 	}
+
+	
 
 
 	camera.Update(dt);
@@ -350,16 +388,18 @@ void Assignment::Update(double dt)
 	spinlikecrazy += (float)(200 * dt);
 	translateX += (float)(10 * dt);
 
+
+	// tail animation
 	if (timer > 2.0)
 	{
 		switch (taildir)
 		{
-		case Assignment::TAIL::D_LEFT:
-			taildir = Assignment::TAIL::D_RIGHT;
+		case Assignment::DIR::D_LEFT:
+			taildir = Assignment::DIR::D_RIGHT;
 			timer = 0;
 			break;
-		case Assignment::TAIL::D_RIGHT:
-			taildir = Assignment::TAIL::D_LEFT;
+		case Assignment::DIR::D_RIGHT:
+			taildir = Assignment::DIR::D_LEFT;
 			timer = 0;
 			break;
 		default:
@@ -368,26 +408,136 @@ void Assignment::Update(double dt)
 		
 	}
 
-	if (taildir == Assignment::TAIL::D_LEFT)
+	if (taildir == Assignment::DIR::D_LEFT)
 	{
 		tailrotate -= (float)(30 * dt);
 	}
-	else if (taildir == Assignment::TAIL::D_RIGHT)
+	else if (taildir == Assignment::DIR::D_RIGHT)
 	{
 		tailrotate += (float)(30 * dt);
 	}
-	
 
-	if (scaleAll >2)
+
+	//walk animation 
+	if (walk == 1)
 	{
-		scaleAll -= (float)(20 * dt);
+		timer1 += dt;
+
+		if (timer1 > 0.4)
+		{
+			if (rightleg == Assignment::DIR::D_FORWARD)
+			{
+				rightleg = Assignment::DIR::D_BACKWARD;
+				timer1 = 0;
+			}
+			else if (rightleg == Assignment::DIR::D_BACKWARD)
+			{
+				rightleg = Assignment::DIR::D_FORWARD;
+				timer1 = 0;
+			}
+
+			if (leftleg == Assignment::DIR::D_FORWARD)
+			{
+				leftleg = Assignment::DIR::D_BACKWARD;
+				timer1 = 0;
+			}
+			else if (leftleg == Assignment::DIR::D_BACKWARD)
+			{
+				leftleg = Assignment::DIR::D_FORWARD;
+				timer1 = 0;
+			}
+
+		}
+
+
+		if (leftleg == Assignment::DIR::D_FORWARD)
+		{
+			leftlegrotate -= (float)(150 * dt);
+		}
+		else if (leftleg == Assignment::DIR::D_BACKWARD)
+		{
+			leftlegrotate += (float)(150 * dt);
+		}
+
+		if (rightleg == Assignment::DIR::D_FORWARD)
+		{
+			rightlegrotate -= (float)(150 * dt);
+		}
+		else if (rightleg == Assignment::DIR::D_BACKWARD)
+		{
+			rightlegrotate += (float)(150 * dt);
+		}
 	}
-	else
+
+	//jump animation 
+
+	if (jump == true)
 	{
-		scaleAll = 100;
+		timer3 += dt;
+
+		if (timer3 > 0.2)
+		{
+			switch (jumpdir)
+			{
+			case Assignment::DIR::D_UP:
+				jumpdir = Assignment::DIR::D_DOWN;
+				break;
+			case Assignment::DIR::D_DOWN:
+				jumpdir = Assignment::DIR::D_UP;
+				break;
+			default:
+				break;
+			}
+
+			timer3 = 0;
+		}
+
+		if (jumpdir == Assignment::DIR::D_UP)
+		{
+			jumpoffset += (7 *dt);
+		}
+		else if (jumpdir == Assignment::DIR::D_DOWN)
+		{
+			jumpoffset -= (7 * dt);
+		}
+
 	}
 
+	if (jumphigh == true)
+	{
+		timer3 += dt;
 
+		if (timer3 > 0.4)
+		{
+			switch (jumpdir)
+			{
+			case Assignment::DIR::D_UP:
+				jumpdir = Assignment::DIR::D_DOWN;
+				break;
+			case Assignment::DIR::D_DOWN:
+				jumpdir = Assignment::DIR::D_UP;
+				break;
+			default:
+				break;
+			}
+
+			timer3 = 0;
+		}
+
+		if (jumpdir == Assignment::DIR::D_UP)
+		{
+			jumpoffset += (7 * dt);
+			rightlegrotate += (60 * dt);
+			leftlegrotate += (60 * dt);
+		}
+		else if (jumpdir == Assignment::DIR::D_DOWN)
+		{
+			jumpoffset -= (7 * dt);
+			rightlegrotate -= (60 * dt);
+			leftlegrotate -= (60 * dt);
+		}
+
+	}
 }
 
 void Assignment::Render()
@@ -446,27 +596,45 @@ void Assignment::Render()
 
 	modelStack.PushMatrix();
 	modelStack.Rotate(-90, 1, 0, 0);
-	modelStack.Translate(0, 0, -23);
+	modelStack.Translate(0, 0, -20);
 	modelStack.Scale(30, 30, 30);
 	RenderMesh(meshList[GEO_QUAD], true);
 	modelStack.PopMatrix();
 
+
+	//body
+	modelStack.PushMatrix();
+	modelStack.Translate(0, jumpoffset -1, 0);
+	/*modelStack.Rotate(0, 0, 1, 0);*/
+	modelStack.Scale(2, 1.7, 1.8);
+	RenderMesh(meshList[GEO_BODY], true);
+	
+	//body front
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, 0.5);
+	/*modelStack.Rotate(0, 0, 1, 0);*/
+	modelStack.Scale(0.92, 0.94, 0.88);
+	RenderMesh(meshList[GEO_BODYFRONT], true);
+	modelStack.PopMatrix();
+
+
 	//head
 	modelStack.PushMatrix();
-	modelStack.Translate(0, 3.3,-0.2);
+	modelStack.Translate(0, 2.75, -0.2);
 	modelStack.Rotate(-20, 1, 0, 0);
-	modelStack.Scale(1.3, 1, 1);
+	modelStack.Scale(0.8, 0.7, 0.7);
 	RenderMesh(meshList[GEO_HEAD], true);
 	/*modelStack.PopMatrix();*/
 
 	//head front
 	modelStack.PushMatrix();
-	modelStack.Translate(0,-0.1, 0.3);
+
+	modelStack.Translate(0, -0.1, 0.3);
 	modelStack.Rotate(180, 0, 0, 1);
-	modelStack.Scale(0.95, 0.9, 0.9);
+	modelStack.Scale(0.96, 0.9, 0.85);
 	RenderMesh(meshList[GEO_HEADFRONT], true);
 	modelStack.PopMatrix();
-	
+
 
 	// right eye
 	modelStack.PushMatrix();
@@ -488,7 +656,7 @@ void Assignment::Render()
 
 	// mouth
 	modelStack.PushMatrix();
-	modelStack.Translate(0,-0.3, 1.7);
+	modelStack.Translate(0, -0.3, 1.6);
 	modelStack.Rotate(180, 1, 0, 0);
 	/*modelStack.Rotate(10, 0, 1, 0);*/
 	modelStack.Scale(0.5f, 0.45f, 0.2f);
@@ -558,28 +726,52 @@ void Assignment::Render()
 	RenderMesh(meshList[GEO_HEADHORNS], true);
 	modelStack.PopMatrix();
 
+	modelStack.PopMatrix(); //back to head
+
+	//right arm
+	modelStack.PushMatrix();
+	modelStack.Translate(-1.4, 1, 0.3);
+	modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);
+	modelStack.Scale(0.45, 0.25, 0.25);
+	RenderMesh(meshList[GEO_RIGHTARM], true);
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-2, 0, 2);
+	modelStack.Rotate(90, 0, 1, 0);
+	/*modelStack.Rotate(40, 1, 0, 0);*/
+	modelStack.Scale(1.4, 1, 0.7);
+	RenderMesh(meshList[GEO_RIGHTARM], true);
 	modelStack.PopMatrix();
 
-	//body
-	modelStack.PushMatrix();
-	modelStack.Translate(0, -1, 0);
-	modelStack.Rotate(0, 0, 1, 0);
-	modelStack.Scale(2, 1.7, 1.8);
-	RenderMesh(meshList[GEO_BODY], true);
 	modelStack.PopMatrix();
-	//body front
+
+	// left arm
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -1, 0.7);
-	modelStack.Rotate(0, 0, 1, 0);
-	modelStack.Scale(1.85, 1.6, 1.6);
-	RenderMesh(meshList[GEO_BODYFRONT], true);
+	modelStack.Translate(1.4, 1, 0.3);
+	modelStack.Rotate(-50, 0, 0, 1);
+	modelStack.Rotate(-60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);
+	modelStack.Scale(0.45, 0.25, 0.25);
+	RenderMesh(meshList[GEO_LEFTARM], true);
+
+
+	modelStack.PushMatrix();
+	modelStack.Translate(2, 0, 2);
+	modelStack.Rotate(-90, 0, 1, 0);
+	/*modelStack.Rotate(40, 1, 0, 0);*/
+	modelStack.Scale(1.4, 1, 0.7);
+	RenderMesh(meshList[GEO_RIGHTARM], true);
+	modelStack.PopMatrix();
+
 	modelStack.PopMatrix();
 
 	//tail
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -3, -3);
+	modelStack.Translate(0, -1, -1.9);
 	modelStack.Rotate(-110, 1, 0, 0);
-	modelStack.Scale(1, 1, 1);
+	modelStack.Scale(0.5, 0.5, 0.5);
 	RenderMesh(meshList[GEO_TAIL], true);
 	/*modelStack.PopMatrix();*/
 
@@ -611,53 +803,15 @@ void Assignment::Render()
 
 	modelStack.PopMatrix();
 
-	//right arm
-	modelStack.PushMatrix();
-	modelStack.Translate(-2.9, 0.7, 0.5);
-	modelStack.Rotate(50, 0, 0, 1);
-	modelStack.Rotate(60, 0, 1, 0);
-	modelStack.Rotate(20, 1, 0, 0);
-	modelStack.Scale(0.8,0.5 , 0.5);
-	RenderMesh(meshList[GEO_RIGHTARM], true);
-	modelStack.PopMatrix();
-	
-	modelStack.PushMatrix();
-	modelStack.Translate(-2.7,0.2, 2.5);
-	modelStack.Rotate(70, 0, 0, 1);
-	modelStack.Rotate(40, 0, 1, 0);
-	modelStack.Rotate(40, 1, 0, 0);
-	modelStack.Scale(0.6, 0.6, 0.7);
-	RenderMesh(meshList[GEO_RIGHTARM], true);
-	modelStack.PopMatrix();
-
-	// left arm
-	modelStack.PushMatrix();
-	modelStack.Translate(2.9, 0.7, 0.5);
-	modelStack.Rotate(-50, 0, 0, 1);
-	modelStack.Rotate(-60, 0, 1, 0);
-	modelStack.Rotate(20, 1, 0, 0);
-	modelStack.Scale(0.8, 0.5, 0.5);
-	RenderMesh(meshList[GEO_LEFTARM], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(2.7, 0.2, 2.5);
-	modelStack.Rotate(-70, 0, 0, 1);
-	modelStack.Rotate(-40, 0, 1, 0);
-	modelStack.Rotate(40, 1, 0, 0);
-	modelStack.Scale(0.6, 0.6, 0.7);
-	RenderMesh(meshList[GEO_LEFTARM], true);
-	modelStack.PopMatrix();
 
 	//right leg
 	modelStack.PushMatrix();
-	modelStack.Translate(-2.5, -3, 0.2);
-	/*modelStack.Rotate(50, 0, 0, 1);
-	modelStack.Rotate(60, 0, 1, 0);
-	modelStack.Rotate(20, 1, 0, 0);*/
-	modelStack.Scale(1.2, 1.4, 1.2);
-	RenderMesh(meshList[GEO_RIGHTLEG], true);
+	modelStack.Translate(-1, -1.2, 0.2);
+	modelStack.Rotate(rightlegrotate, 1, 0, 0);
 	
+	modelStack.Scale(0.6, 1 , 0.7);
+	RenderMesh(meshList[GEO_RIGHTLEG], true);
+
 
 	//right foot
 	modelStack.PushMatrix();
@@ -668,18 +822,16 @@ void Assignment::Render()
 	modelStack.Scale(1.2, 0.8, 1.3);
 	RenderMesh(meshList[GEO_RIGHTLEGFOOT], true);
 	modelStack.PopMatrix();
-	
+
 	modelStack.PopMatrix();
 
 	//left leg
 	modelStack.PushMatrix();
-	modelStack.Translate(2.5, -3, 0.1);
-	/*modelStack.Rotate(50, 0, 0, 1);
-	modelStack.Rotate(60, 0, 1, 0);
-	modelStack.Rotate(20, 1, 0, 0);*/
-	modelStack.Scale(1.1, 1.4, 1.2);
+	modelStack.Translate(1, -1.2, 0.2);
+	modelStack.Rotate(leftlegrotate, 1, 0, 0);
+	modelStack.Scale(0.6, 1, 0.7);
 	RenderMesh(meshList[GEO_LEFTLEG], true);
-	
+
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, -1.2, 0.2);
@@ -691,6 +843,15 @@ void Assignment::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PopMatrix();
+
+	modelStack.PopMatrix(); //back to body
+
+
+
+
+	
+
+
 	
 
 }

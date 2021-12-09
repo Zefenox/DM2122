@@ -74,10 +74,14 @@ class Assignment : public Scene
 	    NUM_GEOMETRY,
 	};
 
-	enum class TAIL
+	enum class DIR
 	{
 		D_LEFT = 0,
 		D_RIGHT = 1,
+		D_FORWARD = 2,
+		D_BACKWARD = 3,
+		D_UP = 4,
+		D_DOWN = 5,
 	};
 	
 private:
@@ -98,9 +102,23 @@ private:
 	float left;
 	float right;
 
-	float timer;
+	float rightlegrotate;
+	float leftlegrotate;
 
-	TAIL taildir;
+	float timer;
+	float timer1;
+	float timer3;
+
+	int walk;
+	bool jump;
+	bool jumphigh;
+	float jumpoffset;
+
+	DIR taildir;
+	DIR rightleg;
+	DIR leftleg;
+
+	DIR jumpdir;
 
 	Camera2 camera;
 
