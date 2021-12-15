@@ -70,13 +70,21 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName,Color color, float l
 	Vertex v;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<unsigned> index_buffer_data;
+	// top right 
 	v.pos.Set(0.5f, 0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	v.texCoord.Set(10, 10);
 	vertex_buffer_data.push_back(v);
+	// top left
 	v.pos.Set(-0.5f, 0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	v.texCoord.Set(0, 10);
 	vertex_buffer_data.push_back(v);
+	//botom left
 	v.pos.Set(-0.5f, -0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	v.texCoord.Set(0, 0);
 	vertex_buffer_data.push_back(v);
+	//bottom right
 	v.pos.Set(0.5f, -0.5f, 0.5f); v.color = color; v.normal.Set(0, 0, 1);
+	v.texCoord.Set(10, 0);
 	vertex_buffer_data.push_back(v);
 
 
@@ -263,6 +271,7 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 			float z = cosf(Math::DegreeToRadian(phi)) * sinf(Math::DegreeToRadian(theta));
 
 			v.pos.Set(radius * x,radius *  y,radius *  z);		
+			//v.texCoord.Set(x,y);
 			v.color = color;	
 			v.normal.Set(x, y, z);
 			vertex_buffer_data.push_back(v);
