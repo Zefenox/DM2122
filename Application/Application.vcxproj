@@ -163,6 +163,7 @@
     <ClCompile Include="Source\Scene8.cpp" />
     <ClCompile Include="Source\SceneLight.cpp" />
     <ClCompile Include="Source\SceneLight2.cpp" />
+    <ClCompile Include="Source\SceneSkybox.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
@@ -185,6 +186,7 @@
     <ClInclude Include="Source\Scene8.h" />
     <ClInclude Include="Source\SceneLight.h" />
     <ClInclude Include="Source\SceneLight2.h" />
+    <ClInclude Include="Source\SceneSkybox.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\Vertex.h" />
     <ClInclude Include="Utility.h" />
