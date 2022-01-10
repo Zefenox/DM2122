@@ -69,6 +69,7 @@ class SceneSkybox : public Scene
 		GEO_FRONT,
 		GEO_BACK,
 		GEO_BLEND,
+		GEO_NYP,
 	    NUM_GEOMETRY,
 	};
 

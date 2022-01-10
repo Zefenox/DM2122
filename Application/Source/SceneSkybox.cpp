@@ -168,6 +168,9 @@ void SceneSkybox::Init()
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("right", Color(1, 1, 1), 1.f, 1.f);
 	meshList[GEO_RIGHT]->textureID = LoadTGA("Image//right.tga");
 
+	meshList[GEO_NYP] = MeshBuilder::GenerateQuad("nyp", Color(1, 1, 1), 1.f, 1.f);
+	meshList[GEO_NYP]->textureID = LoadTGA("Image//NYP.tga");
+
 
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere",Color(1,0,1), 30,30, 2);
 	meshList[GEO_SPHERE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
@@ -318,6 +321,13 @@ void SceneSkybox::Render()
 	RenderMesh(meshList[GEO_AXES], false);
 
 	RenderSkybox();
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(0, 1, 0, 0);
+	modelStack.Translate(0, 0, 0);
+	modelStack.Scale(30, 30, 30);
+	RenderMesh(meshList[GEO_NYP], true);
+	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
