@@ -24,12 +24,17 @@ void SceneSkybox::Init()
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
+	
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Mtx44 projection;
-	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
-	projectionStack.LoadMatrix(projection);
+
+	glGenVertexArrays(1, &m_vertexArrayID);
+	glBindVertexArray(m_vertexArrayID);
+
 
 	left = 180;
 	right = 0;
@@ -43,7 +48,7 @@ void SceneSkybox::Init()
 	// Enable depth test
 
 	//load vertex and fragment shaders
-	m_programID = LoadShaders("Shader//Texture.vertexshader","Shader//Blending.fragmentshader");
+	m_programID = LoadShaders("Shader//Texture.vertexshader","Shader//Text.fragmentshader");
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 	m_parameters[U_MODELVIEW] = glGetUniformLocation(m_programID, "MV");
 	m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE] = glGetUniformLocation(m_programID, "MV_inverse_transpose");
@@ -59,6 +64,9 @@ void SceneSkybox::Init()
 		glGetUniformLocation(m_programID, "colorTextureEnabled");
 	m_parameters[U_COLOR_TEXTURE] =
 		glGetUniformLocation(m_programID, "colorTexture");
+
+	m_parameters[U_TEXT_ENABLED] = glGetUniformLocation(m_programID, "textEnabled");
+	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID,"textColor");
 
 	m_parameters[U_LIGHT0_POSITION] = glGetUniformLocation(m_programID, "lights[0].position_cameraspace");
 	m_parameters[U_LIGHT0_COLOR] = glGetUniformLocation(m_programID, "lights[0].color");
@@ -168,8 +176,8 @@ void SceneSkybox::Init()
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("right", Color(1, 1, 1), 1.f, 1.f);
 	meshList[GEO_RIGHT]->textureID = LoadTGA("Image//right.tga");
 
-	meshList[GEO_NYP] = MeshBuilder::GenerateQuad("nyp", Color(1, 1, 1), 1.f, 1.f);
-	meshList[GEO_NYP]->textureID = LoadTGA("Image//NYP.tga");
+	/*meshList[GEO_NYP] = MeshBuilder::GenerateQuad("nyp", Color(1, 1, 1), 1.f, 1.f);
+	meshList[GEO_NYP]->textureID = LoadTGA("Image//NYP.tga");*/
 
 
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere",Color(1,0,1), 30,30, 2);
@@ -180,6 +188,29 @@ void SceneSkybox::Init()
 	//meshList[GEO_SPHERE]->textureID = LoadTGA("Image//color.tga");
 
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 10, 10, 1);
+
+	meshList[GEO_MODEL1] = MeshBuilder::GenerateOBJ("model1","OBJ//chair.obj");
+	meshList[GEO_MODEL1]->textureID = LoadTGA("Image//chair.tga");
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
+
+	meshList[GEO_MODEL7] = MeshBuilder::GenerateOBJMTL("model7",
+		"OBJ//house_type01.obj", "OBJ//house_type01.mtl");
+
+	meshList[GEO_MODEL8] = MeshBuilder::GenerateOBJMTL("model7",
+		"OBJ//cottage_obj.obj", "OBJ//cottage_obj.mtl"); //cottage_diffuse
+	meshList[GEO_MODEL8]->textureID = LoadTGA("Image//cottage_diffuse.tga");
+
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
+	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
+
+	Mtx44 projection;
+	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
+	projectionStack.LoadMatrix(projection);
+
 }
 
 void SceneSkybox::Update(double dt)
@@ -322,12 +353,31 @@ void SceneSkybox::Render()
 
 	RenderSkybox();
 
-	modelStack.PushMatrix();
+	//modelStack.PushMatrix();
+	////scale, translate, rotate
+	//modelStack.Translate(0, 10, 1);
+	//RenderMesh(meshList[GEO_MODEL1], true);
+	//modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	////scale, translate, rotate
+	//modelStack.Scale(4, 4, 4);
+	//modelStack.Translate(0, 0, 10);
+	//RenderMesh(meshList[GEO_MODEL7], true);
+	//modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	////scale, translate, rotate
+	//modelStack.Scale(1, 1, 1);
+	//RenderMesh(meshList[GEO_MODEL8], true);
+	//modelStack.PopMatrix();
+
+	/*modelStack.PushMatrix();
 	modelStack.Rotate(0, 1, 0, 0);
 	modelStack.Translate(0, 0, 0);
 	modelStack.Scale(30, 30, 30);
 	RenderMesh(meshList[GEO_NYP], true);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
@@ -347,50 +397,12 @@ void SceneSkybox::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, 0);
-	modelStack.Rotate(0, 0, 1, 0);
-	modelStack.Scale(2, 2, 2);
-	RenderMesh(meshList[GEO_SPHERE], true);
+	//scale, translate, rotate
+	modelStack.Scale(30, 30, 30);
+	RenderText(meshList[GEO_TEXT], "Hello World", Color(0, 1, 0));
 	modelStack.PopMatrix();
 
-
-
-	///*modelStack.PushMatrix();*/
-	//modelStack.Translate(-10,0,0);
-	//modelStack.Rotate(rotateAngleAnti,0,1,0);
-	//modelStack.Scale(2,2,2);
-	//RenderMesh(meshList[GEO_SPHERE], true);
-	///*modelStack.PopMatrix();*/
-
-	//// lat spin
-	//modelStack.PushMatrix();
-	//modelStack.Rotate(rotateAngleAnti, 0, 1, 0);
-	//modelStack.Translate(6, 0, 0);
-	//modelStack.Scale(0.4, 0.4, 0.4);
-	//RenderMesh(meshList[GEO_SPHERE], true);
-	//modelStack.PopMatrix();
-
-	//// vertical
-	//modelStack.PushMatrix();
-	//modelStack.Rotate(rotateAngleClock, 0, 1, 0);
-	//modelStack.Rotate(rotateAngleClock, 0, 0, 1);
-	//modelStack.Translate(3, 3, 0);
-	//modelStack.Scale(0.4, 0.4, 0.4);
-	//RenderMesh(meshList[GEO_SPHERE], true);
-	//modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(-4, 0, 0);
-	//modelStack.Rotate(rotateAngleClock, 0, 0, 1);
-	//modelStack.Rotate(spinlikecrazy, 0, 1, 0);
-	//modelStack.Scale(0.3, 0.3, 0.3);
-	//RenderMesh(meshList[GEO_SPHERE], true);
-	///*modelStack.PopMatrix();*/
-	//
-	//modelStack.Translate(-5, 0, 0);
-	//modelStack.Rotate(rotateAngleAnti, 0, 0, 1);
-	//modelStack.Scale(0.7, 0.7, 0.7);
-	//RenderMesh(meshList[GEO_SPHERE], true);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Hello Screen",Color(0, 1, 0), 4, 0, 0);
 
 }
 
@@ -488,6 +500,74 @@ void SceneSkybox::RenderSkybox()
 	modelStack.Scale(200, 200, 0);
 	RenderMesh(meshList[GEO_RIGHT], false);
 	modelStack.PopMatrix();
+}
+
+void SceneSkybox::RenderText(Mesh* mesh, std::string text, Color color)
+{
+	if (!mesh || mesh->textureID <= 0) //Proper error check
+		return;
+	//glDisable(GL_DEPTH_TEST); //uncomment for RenderTextOnScreen
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
+	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
+	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+	for (unsigned i = 0; i < text.length(); ++i)
+	{
+		Mtx44 characterSpacing;
+		characterSpacing.SetToTranslation(i * 1.0f, 0, 0); //1.0f is the spacing of each character, you may change this value
+			Mtx44 MVP = projectionStack.Top() * viewStack.Top() *
+			modelStack.Top() * characterSpacing;
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE,
+			&MVP.a[0]);
+		mesh->Render((unsigned)text[i] * 6, 6);
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
+	//glEnable(GL_DEPTH_TEST); //uncomment for RenderTextOnScreen
+}
+
+void SceneSkybox::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
+{
+	if (!mesh || mesh->textureID <= 0) //Proper error check
+		return;
+	glDisable(GL_DEPTH_TEST); //uncomment for RenderTextOnScreen
+	Mtx44 ortho;
+	ortho.SetToOrtho(0, 80, 0, 60, -10, 10); //size of screen UI
+	projectionStack.PushMatrix();
+	projectionStack.LoadMatrix(ortho);
+	viewStack.PushMatrix();
+	viewStack.LoadIdentity(); //No need camera for ortho mode
+	modelStack.PushMatrix();
+	modelStack.LoadIdentity(); //Reset modelStack
+	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
+	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
+	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+	for (unsigned i = 0; i < text.length(); ++i)
+	{
+		Mtx44 characterSpacing;
+		characterSpacing.SetToTranslation(0.5f + i * 1.0f, 0.5f, 0); //1.0f is the spacing of each character, you may change this value
+		Mtx44 MVP = projectionStack.Top() * viewStack.Top() *
+			modelStack.Top() * characterSpacing;
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE,
+			&MVP.a[0]);
+		mesh->Render((unsigned)text[i] * 6, 6);
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
+	projectionStack.PopMatrix();
+	viewStack.PopMatrix();
+	modelStack.PopMatrix();
+	glEnable(GL_DEPTH_TEST); //uncomment for RenderTextOnScreen
+	
 }
 
 void SceneSkybox::Exit()

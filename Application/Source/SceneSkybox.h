@@ -47,6 +47,8 @@ class SceneSkybox : public Scene
 		U_NUMLIGHTS, //in case you missed out practical 7
 		U_COLOR_TEXTURE_ENABLED,
 		U_COLOR_TEXTURE,
+		U_TEXT_ENABLED,
+		U_TEXT_COLOR,
 		U_TOTAL,
 	};
 	enum GEOMETRY_TYPE
@@ -70,6 +72,10 @@ class SceneSkybox : public Scene
 		GEO_BACK,
 		GEO_BLEND,
 		GEO_NYP,
+		GEO_MODEL1,
+		GEO_MODEL7,
+		GEO_MODEL8,
+		GEO_TEXT,
 	    NUM_GEOMETRY,
 	};
 
@@ -103,6 +109,8 @@ private:
 
 	void RenderSkybox();
 	
+	void RenderText(Mesh* mesh, std::string text, Color color);
+	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 
 public:
 

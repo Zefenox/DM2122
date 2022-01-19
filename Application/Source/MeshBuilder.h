@@ -23,6 +23,11 @@ public:
 	static Mesh* GenerateHemiSphere(const std::string& meshName, Color color, unsigned numStacks, unsigned numSlices, float radius);
 	static Mesh* GenerateTorus(const std::string& meshName, Color color, float innerR, float outterR);
 	static Mesh* GenerateCylinder(const std::string& meshName, Color color, int height);
+	static Mesh* GenerateOBJ(const std::string& meshName, const std::string& file_path);
+
+	static Mesh* GenerateOBJMTL(const std::string& meshName, const std::string& file_path, const std::string& mtl_path);
+
+	static Mesh* GenerateText(const std::string& meshName, unsigned numRow, unsigned numCol);
 
 };
 
