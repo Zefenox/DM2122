@@ -45,6 +45,28 @@ void SceneSkybox::Init()
 	translateX = 0;
 	scaleAll = 1;
 
+	taildir = SceneSkybox::DIR::D_LEFT;
+
+	rightleg = SceneSkybox::DIR::D_FORWARD;
+	leftleg = SceneSkybox::DIR::D_BACKWARD;
+
+	jumpdir = SceneSkybox::DIR::D_UP;
+
+	tailrotate = 0;
+	rightlegrotate = 0;
+	leftlegrotate = 0;
+
+	jumpoffset = 0;
+
+	timer = 1.0;
+	timer1 = 0.2;
+	timer3 = 0;
+
+	walk = 0;
+
+	jump = false;
+	jumphigh = false;
+
 	// Enable depth test
 
 	//load vertex and fragment shaders
@@ -155,7 +177,7 @@ void SceneSkybox::Init()
 	meshList[GEO_QUAD]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
 	meshList[GEO_QUAD]->material.kShininess = 1.f;
-	//meshList[GEO_QUAD]->textureID = LoadTGA("Image//color.tga");
+	meshList[GEO_QUAD]->textureID = LoadTGA("Image//dirt.tga");
 
 	//sky box
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f,1.f);
@@ -175,6 +197,110 @@ void SceneSkybox::Init()
 
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("right", Color(1, 1, 1), 1.f, 1.f);
 	meshList[GEO_RIGHT]->textureID = LoadTGA("Image//right.tga");
+
+	meshList[GEO_HEAD] = MeshBuilder::GenerateSphere("Head", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_HEAD]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HEAD]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_HEAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HEAD]->material.kShininess = 1.f;
+
+	//head front
+	meshList[GEO_HEADFRONT] = MeshBuilder::GenerateHemiSphere("Headfront", Color(0.93, 0.74, 0.89), 30, 30, 2);
+	meshList[GEO_HEADFRONT]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HEADFRONT]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_HEADFRONT]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HEADFRONT]->material.kShininess = 1.f;
+
+	//body
+	meshList[GEO_BODY] = MeshBuilder::GenerateSphere("Body", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_BODY]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BODY]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_BODY]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_BODY]->material.kShininess = 1.f;
+
+	//body front
+	meshList[GEO_BODYFRONT] = MeshBuilder::GenerateSphere("Bodyfront", Color(0.93, 0.74, 0.89), 30, 30, 2);
+	meshList[GEO_BODYFRONT]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BODYFRONT]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_BODYFRONT]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_BODYFRONT]->material.kShininess = 1.f;
+
+	//eyes
+	meshList[GEO_EYESPHERE] = MeshBuilder::GenerateSphere("eyesphere", Color(0, 0, 0), 30, 30, 2);
+	meshList[GEO_EYESPHERE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_EYESPHERE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_EYESPHERE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_EYESPHERE]->material.kShininess = 1.f;
+
+	// mouth
+	meshList[GEO_MOUTH] = MeshBuilder::GenerateHemiSphere("mouthhemisphere", Color(0, 0, 0), 30, 30, 2);
+	meshList[GEO_MOUTH]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_MOUTH]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_MOUTH]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_MOUTH]->material.kShininess = 1.f;
+
+	//HEAD HORNS
+	meshList[GEO_HEADHORNS] = MeshBuilder::GenerateHemiSphere("Head horns", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_HEADHORNS]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HEADHORNS]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_HEADHORNS]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HEADHORNS]->material.kShininess = 1.f;
+
+
+	//right arm
+	meshList[GEO_RIGHTARM] = MeshBuilder::GenerateHemiSphere("Right Arm", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_RIGHTARM]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_RIGHTARM]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_RIGHTARM]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_RIGHTARM]->material.kShininess = 1.f;
+
+	//left arm
+	meshList[GEO_LEFTARM] = MeshBuilder::GenerateHemiSphere("Left Arm", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_LEFTARM]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_LEFTARM]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_LEFTARM]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_LEFTARM]->material.kShininess = 1.f;
+
+	//tail
+	meshList[GEO_TAIL] = MeshBuilder::GenerateConicalFrustum("tail", Color(1, 0.54, 0.9), 0.8, 1.0, 1.5);
+	meshList[GEO_TAIL]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_TAIL]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_TAIL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_TAIL]->material.kShininess = 1.f;
+
+	//tail ball
+	meshList[GEO_TAILBALL] = MeshBuilder::GenerateSphere("tailball", Color(1, 0.54, 0.9), 30, 30, 2);
+	meshList[GEO_TAILBALL]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_TAILBALL]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_TAILBALL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_TAILBALL]->material.kShininess = 1.f;
+
+	//right leg
+	meshList[GEO_RIGHTLEG] = MeshBuilder::GenerateCylinder("right leg", Color(1.0, 0.54, 0.9), 2.6);
+	meshList[GEO_RIGHTLEG]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_RIGHTLEG]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_RIGHTLEG]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_RIGHTLEG]->material.kShininess = 1.f;
+
+	meshList[GEO_RIGHTLEGFOOT] = MeshBuilder::GenerateHemiSphere("right leg foot", Color(1, 0.54, 0.9), 20, 20, 1);
+	meshList[GEO_RIGHTLEGFOOT]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_RIGHTLEGFOOT]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_RIGHTLEGFOOT]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_RIGHTLEGFOOT]->material.kShininess = 1.f;
+
+	//Left leg
+
+	meshList[GEO_LEFTLEG] = MeshBuilder::GenerateCylinder("left leg", Color(1.0, 0.54, 0.9), 2.6);
+	meshList[GEO_LEFTLEG]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_LEFTLEG]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_LEFTLEG]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_LEFTLEG]->material.kShininess = 1.f;
+
+	meshList[GEO_LEFTLEGFOOT] = MeshBuilder::GenerateHemiSphere("left leg foot", Color(1, 0.54, 0.9), 20, 20, 1);
+	meshList[GEO_LEFTLEGFOOT]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_LEFTLEGFOOT]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_LEFTLEGFOOT]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_LEFTLEGFOOT]->material.kShininess = 1.f;
 
 	/*meshList[GEO_NYP] = MeshBuilder::GenerateQuad("nyp", Color(1, 1, 1), 1.f, 1.f);
 	meshList[GEO_NYP]->textureID = LoadTGA("Image//NYP.tga");*/
@@ -209,7 +335,7 @@ void SceneSkybox::Init()
 
 	meshList[GEO_TREE_TALL] = MeshBuilder::GenerateOBJMTL("modeltreetall",
 		"OBJ//TreeTall.obj", "OBJ//TreeTall.mtl"); //cottage_diffuse
-	meshList[GEO_TREE_TALL]->textureID = LoadTGA("Image//TreeTall.tga");
+	//meshList[GEO_TREE_TALL]->textureID = LoadTGA("Image//TreeTall.tga");
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -281,14 +407,20 @@ void SceneSkybox::Update(double dt)
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
 
-	else if (Application::IsKeyPressed('0'))
+	/*else if (Application::IsKeyPressed('0'))
 	{
 		bEnableLight = false;
-	}
+	}*/
 
-	else if (Application::IsKeyPressed('9'))
+	static bool bstate = false;
+	if (!bstate && Application::IsKeyPressed('9'))
 	{
-		bEnableLight = true;
+		bstate = true;
+		bEnableLight = !bEnableLight;
+	}
+	else if (bstate && !Application::IsKeyPressed('9'))
+	{
+		bstate = false;
 	}
 
 	camera.Update(dt);
@@ -305,9 +437,434 @@ void SceneSkybox::Update(double dt)
 	{
 		scaleAll = 100;
 	}
+
+	// tail animation
+	if (timer > 2.0)
+	{
+		switch (taildir)
+		{
+		case SceneSkybox::DIR::D_LEFT:
+			taildir = SceneSkybox::DIR::D_RIGHT;
+			timer = 0;
+			break;
+		case SceneSkybox::DIR::D_RIGHT:
+			taildir = SceneSkybox::DIR::D_LEFT;
+			timer = 0;
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	if (taildir == SceneSkybox::DIR::D_LEFT)
+	{
+		tailrotate -= (float)(30 * dt);
+	}
+	else if (taildir == SceneSkybox::DIR::D_RIGHT)
+	{
+		tailrotate += (float)(30 * dt);
+	}
+
+
+	//walk animation 
+	if (walk == 1)
+	{
+		timer1 += dt;
+
+		if (timer1 > 0.4)
+		{
+			if (rightleg == SceneSkybox::DIR::D_FORWARD)
+			{
+				rightleg = SceneSkybox::DIR::D_BACKWARD;
+				timer1 = 0;
+			}
+			else if (rightleg == SceneSkybox::DIR::D_BACKWARD)
+			{
+				rightleg = SceneSkybox::DIR::D_FORWARD;
+				timer1 = 0;
+			}
+
+			if (leftleg == SceneSkybox::DIR::D_FORWARD)
+			{
+				leftleg = SceneSkybox::DIR::D_BACKWARD;
+				timer1 = 0;
+			}
+			else if (leftleg == SceneSkybox::DIR::D_BACKWARD)
+			{
+				leftleg = SceneSkybox::DIR::D_FORWARD;
+				timer1 = 0;
+			}
+
+		}
+
+
+		if (leftleg == SceneSkybox::DIR::D_FORWARD)
+		{
+			leftlegrotate -= (float)(150 * dt);
+		}
+		else if (leftleg == SceneSkybox::DIR::D_BACKWARD)
+		{
+			leftlegrotate += (float)(150 * dt);
+		}
+
+		if (rightleg == SceneSkybox::DIR::D_FORWARD)
+		{
+			rightlegrotate -= (float)(150 * dt);
+		}
+		else if (rightleg == SceneSkybox::DIR::D_BACKWARD)
+		{
+			rightlegrotate += (float)(150 * dt);
+		}
+	}
+
+	//jump animation 
+
+	if (jump == true)
+	{
+		timer3 += dt;
+
+		if (timer3 > 0.2)
+		{
+			switch (jumpdir)
+			{
+			case SceneSkybox::DIR::D_UP:
+				jumpdir = SceneSkybox::DIR::D_DOWN;
+				break;
+			case SceneSkybox::DIR::D_DOWN:
+				jumpdir = SceneSkybox::DIR::D_UP;
+				break;
+			default:
+				break;
+			}
+
+			timer3 = 0;
+		}
+
+		if (jumpdir == SceneSkybox::DIR::D_UP)
+		{
+			jumpoffset += (7 * dt);
+		}
+		else if (jumpdir == SceneSkybox::DIR::D_DOWN)
+		{
+			jumpoffset -= (7 * dt);
+		}
+
+	}
+
+	if (jumphigh == true)
+	{
+		timer3 += dt;
+
+		if (timer3 > 0.4)
+		{
+			switch (jumpdir)
+			{
+			case SceneSkybox::DIR::D_UP:
+				jumpdir = SceneSkybox::DIR::D_DOWN;
+				break;
+			case SceneSkybox::DIR::D_DOWN:
+				jumpdir = SceneSkybox::DIR::D_UP;
+				break;
+			default:
+				break;
+			}
+
+			timer3 = 0;
+		}
+
+		if (jumpdir == SceneSkybox::DIR::D_UP)
+		{
+			jumpoffset += (7 * dt);
+			rightlegrotate += (60 * dt);
+			leftlegrotate += (60 * dt);
+		}
+		else if (jumpdir == SceneSkybox::DIR::D_DOWN)
+		{
+			jumpoffset -= (7 * dt);
+			rightlegrotate -= (60 * dt);
+			leftlegrotate -= (60 * dt);
+		}
+
+	}
+
+	if (Application::IsKeyPressed('G'))
+	{
+		//to do: switch light type to POINT and pass the information to shader
+		walk = 1;
+		jump = true;
+	}
+	if (Application::IsKeyPressed('B'))
+	{
+		//to do: switch light type to POINT and pass the information to shader
+		jumphigh = true;
+	}
+	else if (Application::IsKeyPressed('H'))
+	{
+		//to do: switch light type to POINT and pass the information to shader
+		rightleg = SceneSkybox::DIR::D_FORWARD;
+		leftleg = SceneSkybox::DIR::D_BACKWARD;
+		jumpdir = SceneSkybox::DIR::D_UP;
+
+		rightlegrotate = 0;
+		leftlegrotate = 0;
+
+		walk = 0;
+		timer1 = 0.2;
+		timer3 = 0;
+		jumpoffset = 0;
+		jump = false;
+		jumphigh = false;
+
+	}
 	
 }
+void SceneSkybox::RenderChoncc()
+{
+	//body
+	modelStack.PushMatrix();
+	modelStack.Translate(-5, jumpoffset +4, 0);
+	modelStack.Rotate(-90, 0, 1, 0);
+	modelStack.Scale(2, 1.7, 1.8);
+	RenderMesh(meshList[GEO_BODY], true);
 
+	//body front
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, 0.5);
+	/*modelStack.Rotate(0, 0, 1, 0);*/
+	modelStack.Scale(0.92, 0.94, 0.88);
+	RenderMesh(meshList[GEO_BODYFRONT], true);
+	modelStack.PopMatrix();
+
+
+	//head
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 2.75, -0.2);
+	modelStack.Rotate(-20, 1, 0, 0);
+	modelStack.Scale(0.8, 0.7, 0.7);
+	RenderMesh(meshList[GEO_HEAD], true);
+	/*modelStack.PopMatrix();*/
+
+	//head front
+	modelStack.PushMatrix();
+
+	modelStack.Translate(0, -0.1, 0.3);
+	modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Scale(0.96, 0.9, 0.85);
+	RenderMesh(meshList[GEO_HEADFRONT], true);
+	modelStack.PopMatrix();
+
+
+	// right eye
+	modelStack.PushMatrix();
+	modelStack.Translate(-0.6, 0.3, 1.76);
+	modelStack.Rotate(-10, 0, 0, 1);
+	modelStack.Rotate(-10, 0, 1, 0);
+	modelStack.Scale(0.2, 0.1, 0.1);
+	RenderMesh(meshList[GEO_EYESPHERE], true);
+	modelStack.PopMatrix();
+
+	// left eye
+	modelStack.PushMatrix();
+	modelStack.Translate(0.6, 0.3, 1.76);
+	modelStack.Rotate(10, 0, 0, 1);
+	modelStack.Rotate(10, 0, 1, 0);
+	modelStack.Scale(0.2, 0.1, 0.1);
+	RenderMesh(meshList[GEO_EYESPHERE], true);
+	modelStack.PopMatrix();
+
+	// mouth
+	modelStack.PushMatrix();
+	modelStack.Translate(0, -0.3, 1.6);
+	modelStack.Rotate(180, 1, 0, 0);
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.5f, 0.45f, 0.2f);
+	RenderMesh(meshList[GEO_MOUTH], true);
+	modelStack.PopMatrix();
+
+	//horns
+	// right horn
+	modelStack.PushMatrix();
+	modelStack.Translate(-0.8f, 1.4f, 0.3f);
+	modelStack.Rotate(5, 0, 0, 1);
+	modelStack.Rotate(-10, 1, 0, 0);
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.25f, 0.9f, 0.3f);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	//left horn
+	modelStack.PushMatrix();
+	modelStack.Translate(0.8, 1.4, 0.3);
+	modelStack.Rotate(-5, 0, 0, 1);
+	modelStack.Rotate(-10, 1, 0, 0);
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.25f, 0.9f, 0.3f);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	//right face scales
+	modelStack.PushMatrix();
+	modelStack.Translate(-1.6, 0, 0.3);
+	modelStack.Rotate(90, 0, 0, 1);
+	modelStack.Rotate(-40, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.3f, 0.6f, 0.2f);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-1.6, -0.7, 0);
+	modelStack.Rotate(130, 0, 0, 1);
+	modelStack.Rotate(-20, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.2, 0.4, 0.15);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	//left face scales
+	modelStack.PushMatrix();
+	modelStack.Translate(1.6, 0, 0.3);
+	modelStack.Rotate(-90, 0, 0, 1);
+	modelStack.Rotate(-40, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.3, 0.6, 0.2);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(1.6, -0.7, 0);
+	modelStack.Rotate(-130, 0, 0, 1);
+	modelStack.Rotate(-20, 1, 0, 0);
+	/*modelStack.Rotate(-10, 1, 0, 0);*/
+	/*modelStack.Rotate(10, 0, 1, 0);*/
+	modelStack.Scale(0.2, 0.4, 0.15);
+	RenderMesh(meshList[GEO_HEADHORNS], true);
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix(); //back to head
+
+	//right arm
+	modelStack.PushMatrix();
+	modelStack.Translate(-1.4, 1, 0.3);
+	modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);
+	modelStack.Scale(0.45, 0.25, 0.25);
+	RenderMesh(meshList[GEO_RIGHTARM], true);
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-2, 0, 2);
+	modelStack.Rotate(90, 0, 1, 0);
+	/*modelStack.Rotate(40, 1, 0, 0);*/
+	modelStack.Scale(1.4, 1, 0.7);
+	RenderMesh(meshList[GEO_RIGHTARM], true);
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix();
+
+	// left arm
+	modelStack.PushMatrix();
+	modelStack.Translate(1.4, 1, 0.3);
+	modelStack.Rotate(-50, 0, 0, 1);
+	modelStack.Rotate(-60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);
+	modelStack.Scale(0.45, 0.25, 0.25);
+	RenderMesh(meshList[GEO_LEFTARM], true);
+
+
+	modelStack.PushMatrix();
+	modelStack.Translate(2, 0, 2);
+	modelStack.Rotate(-90, 0, 1, 0);
+	/*modelStack.Rotate(40, 1, 0, 0);*/
+	modelStack.Scale(1.4, 1, 0.7);
+	RenderMesh(meshList[GEO_RIGHTARM], true);
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix();
+
+	//tail
+	modelStack.PushMatrix();
+	modelStack.Translate(0, -1, -1.9);
+	modelStack.Rotate(-110, 1, 0, 0);
+	modelStack.Scale(0.5, 0.5, 0.5);
+	RenderMesh(meshList[GEO_TAIL], true);
+	/*modelStack.PopMatrix();*/
+
+	for (int i = 0; i < 9; i++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Rotate(6, 1, 0, 0);
+		modelStack.Rotate(tailrotate, 0, 1, 0);
+		modelStack.Translate(0, 0.7, 0);
+		modelStack.Scale(0.9, 0.9, 0.9);
+		RenderMesh(meshList[GEO_TAIL], true);
+
+	}
+
+	//tail ball
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 3, 0);
+	modelStack.Rotate(0, 1, 0, 0);
+	modelStack.Scale(1.3, 1.3, 1.3);
+	RenderMesh(meshList[GEO_TAILBALL], true);
+
+	modelStack.PopMatrix();
+
+
+	for (int i = 0; i < 9; i++)
+	{
+		modelStack.PopMatrix();
+	}
+
+	modelStack.PopMatrix();
+
+
+	//right leg
+	modelStack.PushMatrix();
+	modelStack.Translate(-1, -1.2, 0.2);
+	modelStack.Rotate(rightlegrotate, 1, 0, 0);
+
+	modelStack.Scale(0.6, 1, 0.7);
+	RenderMesh(meshList[GEO_RIGHTLEG], true);
+
+
+	//right foot
+	modelStack.PushMatrix();
+	modelStack.Translate(0, -1.2, 0.2);
+	/*modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);*/
+	modelStack.Scale(1.2, 0.8, 1.3);
+	RenderMesh(meshList[GEO_RIGHTLEGFOOT], true);
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix();
+
+	//left leg
+	modelStack.PushMatrix();
+	modelStack.Translate(1, -1.2, 0.2);
+	modelStack.Rotate(leftlegrotate, 1, 0, 0);
+	modelStack.Scale(0.6, 1, 0.7);
+	RenderMesh(meshList[GEO_LEFTLEG], true);
+
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, -1.2, 0.2);
+	/*modelStack.Rotate(50, 0, 0, 1);
+	modelStack.Rotate(60, 0, 1, 0);
+	modelStack.Rotate(20, 1, 0, 0);*/
+	modelStack.Scale(1.2, 0.8, 1.3);
+	RenderMesh(meshList[GEO_LEFTLEGFOOT], true);
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix(); //back to body
+}
 void SceneSkybox::Render()
 {
 	//Clear color & depth buffer every frame
@@ -357,11 +914,21 @@ void SceneSkybox::Render()
 
 	RenderSkybox();
 
-	//modelStack.PushMatrix();
-	////scale, translate, rotate
-	//modelStack.Translate(0, 10, 1);
-	//RenderMesh(meshList[GEO_MODEL1], true);
-	//modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	modelStack.Rotate(-90, 1, 0, 0);
+	modelStack.Translate(0, 0, -50);
+	modelStack.Scale(100, 100, 100);
+	
+	RenderMesh(meshList[GEO_QUAD], true);
+	modelStack.PopMatrix();
+
+	RenderChoncc();
+
+	modelStack.PushMatrix();
+	//scale, translate, rotate
+	modelStack.Translate(-20, 10, 1);
+	RenderMesh(meshList[GEO_MODEL1], true);
+	modelStack.PopMatrix();
 
 	//modelStack.PushMatrix();
 	////scale, translate, rotate
@@ -416,12 +983,7 @@ void SceneSkybox::Render()
 	RenderMesh(meshList[GEO_LIGHTBALL], false);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Rotate(-90, 1, 0, 0);
-	modelStack.Translate(0, 0, -20);
-	modelStack.Scale(30, 30, 30);
-	RenderMesh(meshList[GEO_QUAD], true);
-	modelStack.PopMatrix();
+
 
 	modelStack.PushMatrix();
 	//scale, translate, rotate

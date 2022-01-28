@@ -62,8 +62,6 @@ void Camera3::Update(double dt)
 	if(Application::IsKeyPressed(VK_UP))
 	{
 		
-
-
 		float pitch = +CAMERA_SPEED * static_cast<float>(dt);
 
 		right.y = 0;
@@ -109,4 +107,11 @@ void Camera3::Reset()
 	position = defaultPosition;
 	target = defaultTarget;
 	up = defaultUp;
+}
+
+Vector3 Camera3::GetPos()
+{
+
+	return position;
+
 }

@@ -3,7 +3,7 @@
 
 #include <string>
 #include "Vertex.h"
-#include "../Material.h"
+#include "Material.h"
 #include <vector>
 
 /******************************************************************************/

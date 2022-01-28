@@ -28,7 +28,7 @@ struct Material
 
 	unsigned size; //remember to initialize to 0
 	//to do: add a constructor
-	Material() : size(0)
+	Material() : kAmbient(0.1f,0.1f,0.1f), kDiffuse(0.6f,0.6f,0.6f),kSpecular(0.3f,0.3f,0.3f),kShininess(1.f),size(0)
 	{};
 
 	Material& operator=(const Material& rhs)

@@ -4,7 +4,7 @@
 #include <vector>
 #include "Vertex.h"
 #include "Vector3.h"
-#include "../Material.h"
+#include "Material.h"
 
 bool LoadOBJ(
 	const char *file_path, 

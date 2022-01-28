@@ -171,7 +171,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Light.h" />
-    <ClInclude Include="Material.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Assignment.h" />
     <ClInclude Include="Source\Camera.h" />
@@ -179,6 +178,7 @@
     <ClInclude Include="Source\Camera3.h" />
     <ClInclude Include="Source\LoadOBJ.h" />
     <ClInclude Include="Source\LoadTGA.h" />
+    <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\MeshBuilder.h" />
     <ClInclude Include="Source\Scene.h" />

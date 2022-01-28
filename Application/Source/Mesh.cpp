@@ -123,10 +123,6 @@ void Mesh::Render(unsigned offset, unsigned count)
                 sizeof(Color) + sizeof(Vector3)));
     }
 
-
-
-
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     if (materials.size() == 0)
     {

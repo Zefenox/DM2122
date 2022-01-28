@@ -78,7 +78,33 @@ class SceneSkybox : public Scene
 		GEO_MODEL8,
 		GEO_TEXT,
 		GEO_TREE_TALL,
+		GEO_HEAD,
+		GEO_HEADFRONT,
+		GEO_HEADHORNS,
+		GEO_EYESPHERE,
+		GEO_EYECONE,
+		GEO_MOUTH,
+		GEO_BODY,
+		GEO_BODYFRONT,
+		GEO_RIGHTARM,
+		GEO_LEFTARM,
+		GEO_RIGHTLEG,
+		GEO_RIGHTLEGFOOT,
+		GEO_LEFTLEG,
+		GEO_LEFTLEGFOOT,
+		GEO_TAIL,
+		GEO_TAILBALL,
 	    NUM_GEOMETRY,
+	};
+
+	enum class DIR
+	{
+		D_LEFT = 0,
+		D_RIGHT = 1,
+		D_FORWARD = 2,
+		D_BACKWARD = 3,
+		D_UP = 4,
+		D_DOWN = 5,
 	};
 
 	
@@ -95,9 +121,28 @@ private:
 	float spinlikecrazy;
 	float translateX;
 	float scaleAll;
+	float tailrotate;
 
 	float left;
 	float right;
+
+	float rightlegrotate;
+	float leftlegrotate;
+
+	float timer;
+	float timer1;
+	float timer3;
+
+	int walk;
+	bool jump;
+	bool jumphigh;
+	float jumpoffset;
+
+	DIR taildir;
+	DIR rightleg;
+	DIR leftleg;
+
+	DIR jumpdir;
 
 	bool bEnableLight;
 
@@ -122,6 +167,7 @@ public:
 
 	virtual void Init();
 	virtual void Update(double dt);
+	void RenderChoncc();
 	virtual void Render();
 	
 	virtual void Exit();
