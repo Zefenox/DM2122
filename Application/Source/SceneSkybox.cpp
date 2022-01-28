@@ -155,7 +155,7 @@ void SceneSkybox::Init()
 	meshList[GEO_QUAD]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
 	meshList[GEO_QUAD]->material.kShininess = 1.f;
-	meshList[GEO_QUAD]->textureID = LoadTGA("Image//color.tga");
+	//meshList[GEO_QUAD]->textureID = LoadTGA("Image//color.tga");
 
 	//sky box
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f,1.f);
@@ -206,6 +206,10 @@ void SceneSkybox::Init()
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
+
+	meshList[GEO_TREE_TALL] = MeshBuilder::GenerateOBJMTL("modeltreetall",
+		"OBJ//TreeTall.obj", "OBJ//TreeTall.mtl"); //cottage_diffuse
+	meshList[GEO_TREE_TALL]->textureID = LoadTGA("Image//TreeTall.tga");
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -361,16 +365,39 @@ void SceneSkybox::Render()
 
 	//modelStack.PushMatrix();
 	////scale, translate, rotate
-	//modelStack.Scale(4, 4, 4);
 	//modelStack.Translate(0, 0, 10);
+	//modelStack.Scale(2, 2, 2);
 	//RenderMesh(meshList[GEO_MODEL7], true);
 	//modelStack.PopMatrix();
 
-	//modelStack.PushMatrix();
-	////scale, translate, rotate
-	//modelStack.Scale(1, 1, 1);
-	//RenderMesh(meshList[GEO_MODEL8], true);
-	//modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	//scale, translate, rotate
+	modelStack.Translate(20,0,0);
+	modelStack.Scale(1, 1, 1);
+	RenderMesh(meshList[GEO_MODEL8], true);
+	modelStack.PopMatrix();
+
+	for (int i = 0; i < 10; i++)
+	{
+		modelStack.PushMatrix();
+		//scale, translate, rotate
+		modelStack.Translate(-40+(i*8), 0, -20);
+		modelStack.Scale(10, 10, 10);
+		RenderMesh(meshList[GEO_TREE_TALL], true);
+		modelStack.PopMatrix();
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		modelStack.PushMatrix();
+		//scale, translate, rotate
+		modelStack.Translate(-40 + (i * 8), 0, +20);
+		modelStack.Scale(10, 10, 10);
+		RenderMesh(meshList[GEO_TREE_TALL], true);
+		modelStack.PopMatrix();
+	}
+
+	
 
 	/*modelStack.PushMatrix();
 	modelStack.Rotate(0, 1, 0, 0);

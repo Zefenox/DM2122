@@ -8,6 +8,7 @@
 #include "MatrixStack.h"
 #include "../Light.h"
 #include "Camera2.h"
+#include "Camera3.h"
 
 
 class SceneSkybox : public Scene
@@ -76,6 +77,7 @@ class SceneSkybox : public Scene
 		GEO_MODEL7,
 		GEO_MODEL8,
 		GEO_TEXT,
+		GEO_TREE_TALL,
 	    NUM_GEOMETRY,
 	};
 
@@ -99,7 +101,7 @@ private:
 
 	bool bEnableLight;
 
-	Camera2 camera;
+	Camera3 camera;
 
 	MS modelStack, viewStack, projectionStack;
 
