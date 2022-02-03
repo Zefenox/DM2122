@@ -10,15 +10,11 @@ Default constructor - generate VBO/IBO here
 \param meshName - name of mesh
 */
 /******************************************************************************/
-Mesh::Mesh(const std::string &meshName)
-	: name(meshName)
-	, mode(DRAW_TRIANGLES)
-	, textureID(0)
+Mesh::Mesh(const std::string& meshName) : name(meshName), mode(DRAW_TRIANGLES), textureID(0)
 {
-	//generate bufefrs
-	glGenBuffers(1, &vertexBuffer);
-	glGenBuffers(1, &colorBuffer);
-	glGenBuffers(1, &indexBuffer);
+    glGenBuffers(1, &vertexBuffer);
+    glGenBuffers(1, &indexBuffer);
+
 }
 
 /******************************************************************************/
@@ -29,12 +25,11 @@ Destructor - delete VBO/IBO here
 /******************************************************************************/
 Mesh::~Mesh()
 {
-	glDeleteBuffers(1, &vertexBuffer);
-	glDeleteBuffers(1, &colorBuffer);
-	glDeleteBuffers(1, &indexBuffer);
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteBuffers(1, &indexBuffer);
 
-	if (textureID > 0)
-		glDeleteTextures(1, &textureID);
+    if (textureID > 0)
+        glDeleteTextures(1, &textureID);
 }
 
 /******************************************************************************/
@@ -104,6 +99,23 @@ void Mesh::Render()
 
 }
 
+unsigned Mesh::locationKa;
+unsigned Mesh::locationKd;
+unsigned Mesh::locationKs;
+unsigned Mesh::locationNs;
+void Mesh::SetMaterialLoc(unsigned ambient, unsigned diffuse,
+    unsigned specular, unsigned shininess)
+{
+    locationKa = ambient;
+    locationKd = diffuse;
+    locationKs = specular;
+    locationNs = shininess;
+}
+
+
+
+
+
 void Mesh::Render(unsigned offset, unsigned count)
 {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -123,18 +135,19 @@ void Mesh::Render(unsigned offset, unsigned count)
                 sizeof(Color) + sizeof(Vector3)));
     }
 
+
+
+
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     if (materials.size() == 0)
     {
-        if (mode == DRAW_TRIANGLE_STRIP)
-            glDrawElements(GL_TRIANGLE_STRIP, indexSize,
-                GL_UNSIGNED_INT, 0);
-        else if (mode == DRAW_LINES)
-            glDrawElements(GL_LINES, indexSize,
-                GL_UNSIGNED_INT, 0);
+        if (mode == DRAW_LINES)
+            glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+        else if (mode == DRAW_TRIANGLE_STRIP)
+            glDrawElements(GL_TRIANGLE_STRIP, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
         else
-            glDrawElements(GL_TRIANGLES, indexSize,
-                GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
     }
     else
     {
@@ -146,29 +159,16 @@ void Mesh::Render(unsigned offset, unsigned count)
             glUniform3fv(locationKd, 1, &material.kDiffuse.r);
             glUniform3fv(locationKs, 1, &material.kSpecular.r);
             glUniform1f(locationNs, material.kShininess);
-            if (mode == DRAW_LINES)
-                glDrawElements(GL_LINES, count, GL_UNSIGNED_INT,
-                    (void*)(offset * sizeof(GLuint)));
-            else if (mode == DRAW_TRIANGLE_STRIP)
-                glDrawElements(GL_TRIANGLE_STRIP, count, GL_UNSIGNED_INT,
-                    (void*)(offset * sizeof(GLuint)));
+            if (mode == DRAW_TRIANGLE_STRIP)
+                glDrawElements(GL_TRIANGLE_STRIP, material.size,
+                    GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
+            else if (mode == DRAW_LINES)
+                glDrawElements(GL_LINES, material.size, GL_UNSIGNED_INT,
+                    (void*)(offset * sizeof(unsigned)));
             else
-                glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT,
-                    (void*)(offset * sizeof(GLuint)));
+                glDrawElements(GL_TRIANGLES, material.size,
+                    GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
             offset += material.size;
         }
     }
-}
-
-unsigned Mesh::locationKa;
-unsigned Mesh::locationKd;
-unsigned Mesh::locationKs;
-unsigned Mesh::locationNs;
-void Mesh::SetMaterialLoc(unsigned ambient, unsigned diffuse,
-    unsigned specular, unsigned shininess)
-{
-    locationKa = ambient;
-    locationKd = diffuse;
-    locationKs = specular;
-    locationNs = shininess;
 }
