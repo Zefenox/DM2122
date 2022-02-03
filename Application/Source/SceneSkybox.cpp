@@ -617,6 +617,8 @@ void SceneSkybox::Update(double dt)
 		jumphigh = false;
 
 	}
+
+	
 	
 }
 void SceneSkybox::RenderChoncc()

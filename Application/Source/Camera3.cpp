@@ -109,9 +109,4 @@ void Camera3::Reset()
 	up = defaultUp;
 }
 
-Vector3 Camera3::GetPos()
-{
 
-	return position;
-
-}
