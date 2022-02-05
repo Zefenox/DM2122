@@ -28,6 +28,8 @@ void Camera3::Update(double dt)
 
 	Vector3 view = (target - position).Normalized();
 	Vector3 right = view.Cross(up);
+
+	
 		
 	if(Application::IsKeyPressed(VK_RIGHT))
 	{
@@ -72,27 +74,44 @@ void Camera3::Update(double dt)
 		view = rotation * view;
 		target = position + view;
 	}
-	if(Application::IsKeyPressed('W'))
+	if (Application::IsKeyPressed('W'))
 	{
+
 		position += view * ZOOM_SPEED * static_cast<float>(dt);
+		if (position.x > 49 || position.x < -49 || position.z > 49 || position.z < -49)
+		{
+			position -= view * ZOOM_SPEED * static_cast<float>(dt);
+		}
 		position.y = 3;
 		target = position + view;
 	}
 	if(Application::IsKeyPressed('S'))
 	{
 		position -= view * ZOOM_SPEED * static_cast<float>(dt);
+		if (position.x > 49 || position.x < -49 || position.z > 49 || position.z < -49)
+		{
+			position += view * ZOOM_SPEED * static_cast<float>(dt);
+		}
 		position.y = 3;
 		target = position + view;
 	}
 	if (Application::IsKeyPressed('A'))
 	{
 		position -= right * ZOOM_SPEED * static_cast<float>(dt);
+		if (position.x > 49 || position.x < -49 || position.z > 49 || position.z < -49)
+		{
+			position += right * ZOOM_SPEED * static_cast<float>(dt);
+		}
 		position.y = 3;
 		target = position + view;
 	}
 	if (Application::IsKeyPressed('D'))
 	{
 		position += right * ZOOM_SPEED * static_cast<float>(dt);
+		if (position.x > 49 || position.x < -49 || position.z > 49 || position.z < -49)
+		{
+			position -= right * ZOOM_SPEED * static_cast<float>(dt);
+		}
 		position.y = 3;
 		target = position + view;
 	}

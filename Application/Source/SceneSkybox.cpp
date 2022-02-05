@@ -423,7 +423,12 @@ void SceneSkybox::Update(double dt)
 		bstate = false;
 	}
 
+	
+
 	camera.Update(dt);
+	
+
+	
 
 	rotateAngleAnti += (float)(40 * dt);
 	rotateAngleClock -= (float)(50 * dt);
@@ -617,7 +622,7 @@ void SceneSkybox::Update(double dt)
 		jumphigh = false;
 
 	}
-
+	
 	
 	
 }
@@ -637,7 +642,7 @@ void SceneSkybox::RenderChoncc()
 	modelStack.Scale(0.92, 0.94, 0.88);
 	RenderMesh(meshList[GEO_BODYFRONT], true);
 	modelStack.PopMatrix();
-
+	
 
 	//head
 	modelStack.PushMatrix();
@@ -926,11 +931,11 @@ void SceneSkybox::Render()
 
 	RenderChoncc();
 
-	modelStack.PushMatrix();
-	//scale, translate, rotate
-	modelStack.Translate(-20, 10, 1);
-	RenderMesh(meshList[GEO_MODEL1], true);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	////scale, translate, rotate
+	//modelStack.Translate(-20, 10, 1);
+	//RenderMesh(meshList[GEO_MODEL1], true);
+	//modelStack.PopMatrix();
 
 	//modelStack.PushMatrix();
 	////scale, translate, rotate
@@ -946,25 +951,48 @@ void SceneSkybox::Render()
 	RenderMesh(meshList[GEO_MODEL8], true);
 	modelStack.PopMatrix();
 
-	for (int i = 0; i < 10; i++)
+	//bounding trees
+
+	for (int i = 0; i < 20; i++)
 	{
 		modelStack.PushMatrix();
 		//scale, translate, rotate
-		modelStack.Translate(-40+(i*8), 0, -20);
+		modelStack.Translate(-50+(i*5), 0, -50);
 		modelStack.Scale(10, 10, 10);
 		RenderMesh(meshList[GEO_TREE_TALL], true);
 		modelStack.PopMatrix();
 	}
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		modelStack.PushMatrix();
 		//scale, translate, rotate
-		modelStack.Translate(-40 + (i * 8), 0, +20);
+		modelStack.Translate(-50 + (i * 5), 0, +50);
 		modelStack.Scale(10, 10, 10);
 		RenderMesh(meshList[GEO_TREE_TALL], true);
 		modelStack.PopMatrix();
 	}
+
+	for (int i = 0; i < 20; i++)
+	{
+		modelStack.PushMatrix();
+		//scale, translate, rotate
+		modelStack.Translate(-50, 0, -50 + (i * 5));
+		modelStack.Scale(10, 10, 10);
+		RenderMesh(meshList[GEO_TREE_TALL], true);
+		modelStack.PopMatrix();
+	}
+
+	for (int i = 0; i < 20; i++)
+	{
+		modelStack.PushMatrix();
+		//scale, translate, rotate
+		modelStack.Translate(50, 0, -50 + (i * 5));
+		modelStack.Scale(10, 10, 10);
+		RenderMesh(meshList[GEO_TREE_TALL], true);
+		modelStack.PopMatrix();
+	}
+
 
 	
 
@@ -987,13 +1015,18 @@ void SceneSkybox::Render()
 
 
 
-	modelStack.PushMatrix();
-	//scale, translate, rotate
-	modelStack.Scale(30, 30, 30);
-	RenderText(meshList[GEO_TEXT], "Hello World", Color(0, 1, 0));
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	////scale, translate, rotate
+	//modelStack.Scale(30, 30, 30);
+	//RenderText(meshList[GEO_TEXT], "Hello World", Color(0, 1, 0));
+	//modelStack.PopMatrix();
 
-	RenderTextOnScreen(meshList[GEO_TEXT], "Hello Screen",Color(0, 1, 0), 4, 0, 0);
+	float debugcordx = camera.position.x;
+	float debugcordz = camera.position.z;
+
+
+	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(debugcordx), Color(0, 1, 0), 4, 0, 0);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(debugcordz), Color(0, 1, 0), 4, 0, 4);
 
 }
 
