@@ -82,7 +82,7 @@ void Camera3::Update(double dt)
 		{
 			position -= view * ZOOM_SPEED * static_cast<float>(dt);
 		}
-		position.y = 3;
+		position.y = 3.5;
 		target = position + view;
 	}
 	if(Application::IsKeyPressed('S'))
@@ -92,7 +92,7 @@ void Camera3::Update(double dt)
 		{
 			position += view * ZOOM_SPEED * static_cast<float>(dt);
 		}
-		position.y = 3;
+		position.y = 3.5;
 		target = position + view;
 	}
 	if (Application::IsKeyPressed('A'))
@@ -102,7 +102,7 @@ void Camera3::Update(double dt)
 		{
 			position += right * ZOOM_SPEED * static_cast<float>(dt);
 		}
-		position.y = 3;
+		position.y = 3.5;
 		target = position + view;
 	}
 	if (Application::IsKeyPressed('D'))
@@ -112,13 +112,27 @@ void Camera3::Update(double dt)
 		{
 			position -= right * ZOOM_SPEED * static_cast<float>(dt);
 		}
-		position.y = 3;
+		position.y = 3.5;
 		target = position + view;
 	}
 	if(Application::IsKeyPressed('R'))
 	{
 		Reset();
 	}
+}
+
+void Camera3::Resetview()
+{
+	Vector3 view = (target - position).Normalized();
+	Vector3 right = view.Cross(up);
+
+	right.y = 0;
+	right.Normalize();
+	up = right.Cross(view).Normalized();
+	Mtx44 rotation;
+	rotation.SetToRotation(-50, right.x, right.y, right.z);
+	view = rotation * view;
+	target = position + view;
 }
 
 void Camera3::Reset()

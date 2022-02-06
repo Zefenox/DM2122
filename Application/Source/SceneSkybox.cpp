@@ -67,6 +67,16 @@ void SceneSkybox::Init()
 	jump = false;
 	jumphigh = false;
 
+	CloseToInteractable = false;
+
+	CoinsAlert = false;
+
+	Sitting = false;
+
+	
+
+	coins = 0;
+
 	// Enable depth test
 
 	//load vertex and fragment shaders
@@ -337,6 +347,15 @@ void SceneSkybox::Init()
 		"OBJ//TreeTall.obj", "OBJ//TreeTall.mtl"); //cottage_diffuse
 	//meshList[GEO_TREE_TALL]->textureID = LoadTGA("Image//TreeTall.tga");
 
+	meshList[GEO_WORKBENCH] = MeshBuilder::GenerateOBJMTL("modelworkbench",
+		"OBJ//workbench.obj", "OBJ//workbench.mtl");
+
+	meshList[GEO_CHEST] = MeshBuilder::GenerateOBJMTL("modelchest",
+		"OBJ//chest.obj", "OBJ//chest.mtl");
+
+	meshList[GEO_BED] = MeshBuilder::GenerateOBJMTL("modelbed",
+		"OBJ//bedroll.obj", "OBJ//bedroll.mtl");
+
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
 	projectionStack.LoadMatrix(projection);
@@ -426,7 +445,10 @@ void SceneSkybox::Update(double dt)
 	
 
 	camera.Update(dt);
-	
+
+	CheckColision();
+
+
 
 	
 
@@ -946,9 +968,33 @@ void SceneSkybox::Render()
 
 	modelStack.PushMatrix();
 	//scale, translate, rotate
-	modelStack.Translate(20,0,0);
+	modelStack.Translate(30,0,0);
 	modelStack.Scale(1, 1, 1);
 	RenderMesh(meshList[GEO_MODEL8], true);
+	modelStack.PopMatrix();
+
+	//workbench
+	modelStack.PushMatrix();
+	//scale, translate, rotate
+	modelStack.Translate(-20, 0, 0);
+	modelStack.Scale(3, 3, 3);
+	RenderMesh(meshList[GEO_WORKBENCH], true);
+	modelStack.PopMatrix();
+
+	// chest
+	modelStack.PushMatrix();
+	//scale, translate, rotate
+	modelStack.Translate(-20, 0, -20);
+	modelStack.Scale(3, 3, 3);
+	RenderMesh(meshList[GEO_CHEST], true);
+	modelStack.PopMatrix();
+
+	//bed
+	modelStack.PushMatrix();
+	//scale, translate, rotate
+	modelStack.Translate(-20, 0, 20);
+	modelStack.Scale(3, 3, 3);
+	RenderMesh(meshList[GEO_BED], true);
 	modelStack.PopMatrix();
 
 	//bounding trees
@@ -1027,6 +1073,23 @@ void SceneSkybox::Render()
 
 	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(debugcordx), Color(0, 1, 0), 4, 0, 0);
 	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(debugcordz), Color(0, 1, 0), 4, 0, 4);
+
+	//coins
+	RenderTextOnScreen(meshList[GEO_TEXT], "Coins:", Color(0, 1, 0), 4, 0, 50);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(0, 1, 0), 4, 13, 50);
+
+	//not enough coins alert
+	if (CoinsAlert)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "10 Coins Required", Color(0, 1, 0), 4, 15, 30);
+	}
+	
+	//interactable alert
+	if (CloseToInteractable)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press 'E' to Interact", Color(0, 1, 0), 4, 15, 20);
+	}
+
 
 }
 
@@ -1126,6 +1189,69 @@ void SceneSkybox::RenderSkybox()
 	modelStack.PopMatrix();
 }
 
+void SceneSkybox::CheckColision()
+{
+	static bool bstateinter = false;
+	// workbench interactable
+	if (camera.position.x > -24 && camera.position.x < -16 && camera.position.z > -4 && camera.position.z < 4)
+	{
+		CloseToInteractable = true;
+		if (!bstateinter && Application::IsKeyPressed('E'))
+		{
+			bstateinter = true;
+			if (coins >= 10)
+			{
+				coins -= 10;
+			}
+			else
+			{
+				CoinsAlert = true;
+			}
+		}
+		else if (bstateinter && !Application::IsKeyPressed('E'))
+		{
+			bstateinter = false;
+		}
+	}
+	//chest
+	else if (camera.position.x > -24 && camera.position.x < -16 && camera.position.z > -24 && camera.position.z < -16)
+	{
+		CloseToInteractable = true;
+		if (!bstateinter && Application::IsKeyPressed('E'))
+		{
+			bstateinter = true;
+			coins += 5;
+		}
+		else if (bstateinter && !Application::IsKeyPressed('E'))
+		{
+			bstateinter = false;
+		}
+		
+	}
+	//bed
+	else if (camera.position.x > -24 && camera.position.x < -16 && camera.position.z > 16 && camera.position.z < 24)
+	{
+		CloseToInteractable = true;
+		if (!bstateinter && Application::IsKeyPressed('E'))
+		{
+			bstateinter = true;
+			camera.position.y = 1.5;
+			camera.Resetview();
+		}
+		else if (bstateinter && !Application::IsKeyPressed('E'))
+		{
+			bstateinter = false;
+		}
+	}
+	else
+	{
+		bstateinter = false;
+		CloseToInteractable = false;
+		CoinsAlert = false;
+	}
+
+}
+
 void SceneSkybox::RenderText(Mesh* mesh, std::string text, Color color)
 {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
@@ -1178,7 +1304,7 @@ void SceneSkybox::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, 
 	for (unsigned i = 0; i < text.length(); ++i)
 	{
 		Mtx44 characterSpacing;
-		characterSpacing.SetToTranslation(0.5f + i * 1.0f, 0.5f, 0); //1.0f is the spacing of each character, you may change this value
+		characterSpacing.SetToTranslation(0.5f + i * 0.5f, 0.5f, 0); //1.0f is the spacing of each character, you may change this value
 		Mtx44 MVP = projectionStack.Top() * viewStack.Top() *
 			modelStack.Top() * characterSpacing;
 		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE,

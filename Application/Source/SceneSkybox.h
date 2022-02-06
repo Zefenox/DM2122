@@ -78,6 +78,9 @@ class SceneSkybox : public Scene
 		GEO_MODEL8,
 		GEO_TEXT,
 		GEO_TREE_TALL,
+		GEO_WORKBENCH,
+		GEO_CHEST,
+		GEO_BED,
 		GEO_HEAD,
 		GEO_HEADFRONT,
 		GEO_HEADHORNS,
@@ -152,9 +155,21 @@ private:
 
 	Light light[8];
 
+	bool CloseToInteractable;
+
+	bool CoinsAlert;
+
+	bool Sitting;
+
+	int coins;
+
+	
+
 	virtual void RenderMesh(Mesh* mesh, bool enableLight);
 
 	void RenderSkybox();
+
+	void CheckColision();
 	
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
