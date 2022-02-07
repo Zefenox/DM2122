@@ -97,6 +97,7 @@ class SceneSkybox : public Scene
 		GEO_LEFTLEGFOOT,
 		GEO_TAIL,
 		GEO_TAILBALL,
+		GEO_DONUT,
 	    NUM_GEOMETRY,
 	};
 
@@ -159,9 +160,13 @@ private:
 
 	bool CoinsAlert;
 
+	bool choncceat;
+
 	bool Sitting;
 
 	int coins;
+
+	int donuts;
 
 	
 

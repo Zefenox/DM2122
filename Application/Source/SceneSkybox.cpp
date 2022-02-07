@@ -71,11 +71,16 @@ void SceneSkybox::Init()
 
 	CoinsAlert = false;
 
+	choncceat = false;
+
+
 	Sitting = false;
 
 	
 
 	coins = 0;
+
+	donuts = 0;
 
 	// Enable depth test
 
@@ -188,6 +193,12 @@ void SceneSkybox::Init()
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
 	meshList[GEO_QUAD]->material.kShininess = 1.f;
 	meshList[GEO_QUAD]->textureID = LoadTGA("Image//dirt.tga");
+
+	meshList[GEO_DONUT] = MeshBuilder::GenerateTorus("donut", Color(1, 0, 1), 1.f, 2.f);
+	meshList[GEO_DONUT]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+	meshList[GEO_DONUT]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_DONUT]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
+	meshList[GEO_DONUT]->material.kShininess = 1.f;
 
 	//sky box
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f,1.f);
@@ -455,6 +466,8 @@ void SceneSkybox::Update(double dt)
 	rotateAngleAnti += (float)(40 * dt);
 	rotateAngleClock -= (float)(50 * dt);
 	spinlikecrazy += (float)(200 * dt);
+
+	
 	translateX += (float)(10 * dt);
 	if (scaleAll >2)
 	{
@@ -466,6 +479,7 @@ void SceneSkybox::Update(double dt)
 	}
 
 	// tail animation
+	timer += dt;
 	if (timer > 2.0)
 	{
 		switch (taildir)
@@ -626,7 +640,24 @@ void SceneSkybox::Update(double dt)
 		//to do: switch light type to POINT and pass the information to shader
 		jumphigh = true;
 	}
-	else if (Application::IsKeyPressed('H'))
+	if (choncceat)
+	{
+		jumphigh = true;
+	}
+	static bool bstated = false;
+	if (!bstated && Application::IsKeyPressed('F'))
+	{
+		bstated = true;
+		if (donuts > 0)
+		{
+			donuts -= 1;
+		}
+	}
+	else if (bstated && !Application::IsKeyPressed('F'))
+	{
+		bstated = false;
+	}
+	if (Application::IsKeyPressed('H'))
 	{
 		//to do: switch light type to POINT and pass the information to shader
 		rightleg = SceneSkybox::DIR::D_FORWARD;
@@ -642,6 +673,7 @@ void SceneSkybox::Update(double dt)
 		jumpoffset = 0;
 		jump = false;
 		jumphigh = false;
+		choncceat = false;
 
 	}
 	
@@ -652,7 +684,7 @@ void SceneSkybox::RenderChoncc()
 {
 	//body
 	modelStack.PushMatrix();
-	modelStack.Translate(-5, jumpoffset +4, 0);
+	modelStack.Translate(-1, jumpoffset +4, 0);
 	modelStack.Rotate(-90, 0, 1, 0);
 	modelStack.Scale(2, 1.7, 1.8);
 	RenderMesh(meshList[GEO_BODY], true);
@@ -997,6 +1029,27 @@ void SceneSkybox::Render()
 	RenderMesh(meshList[GEO_BED], true);
 	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	//scale, translate, rotate
+	modelStack.Translate(-20, 7 , 0);
+	modelStack.Rotate(rotateAngleAnti, 0, 0, 1);
+	
+	modelStack.Scale(1, 1, 1);
+	RenderMesh(meshList[GEO_DONUT], true);
+	modelStack.PopMatrix();
+
+	//hand donut
+	if (donuts > 0)
+	{
+		modelStack.PushMatrix();
+		//scale, translate, rotate
+		modelStack.Translate(camera.position.x + 2, 3, camera.position.z);
+		modelStack.Rotate(90, 0, 0, 1);
+		modelStack.Scale(0.2, 0.2, 0.2);
+		RenderMesh(meshList[GEO_DONUT], true);
+		modelStack.PopMatrix();
+	}
+
 	//bounding trees
 
 	for (int i = 0; i < 20; i++)
@@ -1078,6 +1131,10 @@ void SceneSkybox::Render()
 	RenderTextOnScreen(meshList[GEO_TEXT], "Coins:", Color(0, 1, 0), 4, 0, 50);
 	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(0, 1, 0), 4, 13, 50);
 
+	//donuts
+	RenderTextOnScreen(meshList[GEO_TEXT], "Donuts:", Color(0, 1, 0), 4, 0, 40);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(donuts), Color(0, 1, 0), 4, 17, 40);
+
 	//not enough coins alert
 	if (CoinsAlert)
 	{
@@ -1088,6 +1145,19 @@ void SceneSkybox::Render()
 	if (CloseToInteractable)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press 'E' to Interact", Color(0, 1, 0), 4, 15, 20);
+	}
+
+	//chonnc eat
+	if (choncceat)
+	{
+		
+		modelStack.PushMatrix();
+		//scale, translate, rotate
+		modelStack.Translate(-1, 15, 0);
+		modelStack.Scale(3, 3, 3);
+		modelStack.Rotate(-90, 0, 1, 0);
+		RenderText(meshList[GEO_TEXT], "YUMMY!", Color(0, 1, 0));
+		modelStack.PopMatrix();
 	}
 
 
@@ -1202,6 +1272,7 @@ void SceneSkybox::CheckColision()
 			if (coins >= 10)
 			{
 				coins -= 10;
+				donuts += 1;
 			}
 			else
 			{
@@ -1237,6 +1308,24 @@ void SceneSkybox::CheckColision()
 			bstateinter = true;
 			camera.position.y = 1.5;
 			camera.Resetview();
+		}
+		else if (bstateinter && !Application::IsKeyPressed('E'))
+		{
+			bstateinter = false;
+		}
+	}
+	//choncc
+	else if (camera.position.x > -10 && camera.position.x < -6 && camera.position.z > -5 && camera.position.z < 5)
+	{
+		CloseToInteractable = true;
+		if (!bstateinter && Application::IsKeyPressed('E'))
+		{
+			bstateinter = true;
+			if (donuts > 0)
+			{
+				donuts -= 1;
+				choncceat = true;
+			}
 		}
 		else if (bstateinter && !Application::IsKeyPressed('E'))
 		{
